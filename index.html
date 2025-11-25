@@ -233,7 +233,7 @@
   <div class="page">
     <header>
       <h1>Калькулятор оплаты логопеда</h1>
-      <p class="muted">Расчёт месячной оплаты с учётом оклада, замещения, компенсаций и стимулирующих.</p>
+      <p class="muted">Расчёт месячной оплаты с учётом оклада, замещения, компенсаций и стимулирующих. Все суммы и часы вводятся сразу за месяц.</p>
     </header>
 
     <section class="summary" aria-live="polite">
@@ -250,10 +250,6 @@
       <div class="field">
         <label for="period">Период расчёта</label>
         <input id="period" type="text" value="2025" readonly>
-      </div>
-      <div class="field">
-        <label for="weeks_in_month">Число недель в месяце</label>
-        <input id="weeks_in_month" type="number" min="4" max="5" step="0.01">
       </div>
     </section>
 
@@ -369,7 +365,6 @@
 
   <script>
     const defaults = {
-      weeks_in_month: 4.33,
       t_logoped: 70000,
       logoped_share: 1.0,
       k_cat: 1.0,
@@ -389,7 +384,6 @@
     };
 
     const inputs = {
-      weeks_in_month: document.getElementById('weeks_in_month'),
       t_logoped: document.getElementById('t_logoped'),
       logoped_share: document.getElementById('logoped_share'),
       k_cat: document.getElementById('k_cat'),
@@ -458,7 +452,6 @@
     }
 
     function recalc() {
-      const weeksInMonth = parseNumber(inputs.weeks_in_month);
       const tLogoped = parseNumber(inputs.t_logoped);
       const share = parseNumber(inputs.logoped_share);
       const kCat = parseNumber(inputs.k_cat);
