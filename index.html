@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Калькулятор оплаты логопеда</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text: #1f2933;
+      --accent: #2b7a78;
+      --accent-soft: #def2f1;
+      --border: #d9e2ec;
+      --danger: #ef4e4e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 620px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 24px;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .summary {
+      background: linear-gradient(135deg, var(--accent), #3aafa9);
+      color: #fff;
+      border: none;
+    }
+
+    .summary-main {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .summary-details {
+      font-size: 14px;
+      line-height: 1.5;
+      opacity: 0.9;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    input[type="number"], select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 15px;
+    }
+
+    input[readonly], input:disabled, select:disabled {
+      background: #f0f4f8;
+      color: #738391;
+      cursor: not-allowed;
+    }
+
+    input.invalid {
+      border-color: var(--danger);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .sub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px 12px;
+    }
+
+    details {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #f8fbff;
+      padding: 10px 12px;
+      margin-top: 8px;
+    }
+
+    details summary {
+      cursor: pointer;
+      font-weight: 700;
+      list-style: none;
+    }
+
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .accordion-content {
+      margin-top: 8px;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.05s ease;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: var(--accent-soft);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .info {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      position: relative;
+      cursor: help;
+      border: 1px solid var(--accent);
+    }
+
+    .info::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      opacity: 0;
+      visibility: hidden;
+      width: max-content;
+      max-width: 260px;
+      font-weight: 500;
+      z-index: 2;
+      font-size: 12px;
+    }
+
+    .info:focus::after,
+    .info:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .muted {
+      color: #52606d;
+      font-size: 14px;
+    }
+
+    .flex-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>Калькулятор оплаты логопеда</h1>
+      <p class="muted">Расчёт месячной оплаты с учётом оклада, замещения, компенсаций и стимулирующих.</p>
+    </header>
+
+    <section class="summary" aria-live="polite">
+      <div class="summary-main" id="total_display">Итоговая сумма за месяц: 0 ₽</div>
+      <div class="summary-details" id="summary_breakdown"></div>
+    </section>
+
+    <section>
+      <h2>Общие настройки</h2>
+      <div class="field">
+        <label for="system">Система расчёта</label>
+        <input id="system" type="text" value="Москва (ученик-час = 37 ₽)" readonly>
+      </div>
+      <div class="field">
+        <label for="period">Период расчёта</label>
+        <input id="period" type="text" value="2025" readonly>
+      </div>
+      <div class="field">
+        <label for="weeks_in_month">Число недель в месяце</label>
+        <input id="weeks_in_month" type="number" min="4" max="5" step="0.01">
+      </div>
+    </section>
+
+    <section>
+      <h2>Оклад логопеда</h2>
+      <div class="field">
+        <label for="t_logoped">Оклад логопеда за 1 ставку, ₽/месяц</label>
+        <input id="t_logoped" type="number" min="0" step="100">
+      </div>
+      <div class="field">
+        <label for="logoped_share">Доля ставки логопеда</label>
+        <input id="logoped_share" type="number" min="0" max="2" step="0.1">
+      </div>
+      <div class="field">
+        <label for="k_cat">Категория <span class="info" tabindex="0" data-tooltip="Категория педагога: без категории, первая или высшая. Коэффициент повышает оклад.">?</span></label>
+        <select id="k_cat">
+          <option value="1.0">Без категории (1.0)</option>
+          <option value="1.1">Первая категория (1.1)</option>
+          <option value="1.25">Высшая категория (1.25)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="k_staj">Педагогический стаж <span class="info" tabindex="0" data-tooltip="Коэффициент стажа: рост с опытом. Диапазон 1.0–1.5.">?</span></label>
+        <select id="k_staj">
+          <option value="1.0">&lt; 1 года (1.0)</option>
+          <option value="1.1">1–5 лет (1.1)</option>
+          <option value="1.2">5–10 лет (1.2)</option>
+          <option value="1.3">10–15 лет (1.3)</option>
+          <option value="1.4">15–20 лет (1.4)</option>
+          <option value="1.5">20+ лет (1.5)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="k_usl_log">Коэффициент условий труда (логопед) <span class="info" tabindex="0" data-tooltip="Учитывает особые условия труда. Обычно 1.0–1.3.">?</span></label>
+        <input id="k_usl_log" type="number" min="0" step="0.05">
+      </div>
+    </section>
+
+    <section>
+      <h2>Замещающие уроки</h2>
+      <div class="checkbox-row">
+        <input id="use_substitution" type="checkbox" checked>
+        <label for="use_substitution" style="margin:0">Учитывать замещающие уроки</label>
+      </div>
+      <div class="sub-grid" id="substitution_block">
+        <div class="field">
+          <label for="h_subst">Часы замещения в месяц</label>
+          <input id="h_subst" type="number" min="0" step="1">
+        </div>
+        <div class="field">
+          <label for="n_students">Количество учеников в классе/группе</label>
+          <input id="n_students" type="number" min="1" max="25" step="1">
+        </div>
+        <div class="field">
+          <label for="k_corr">K_corr: коэффициент за работу с детьми с умственной отсталостью <span class="info" tabindex="0" data-tooltip="Повышающий коэффициент за коррекционность. Обычно 1.2–1.4.">?</span></label>
+          <input id="k_corr" type="number" min="0" step="0.05">
+        </div>
+        <div class="field">
+          <label for="k_subst">K_subst: коэффициент за замещение отсутствующего учителя <span class="info" tabindex="0" data-tooltip="Оплата за фактическое замещение. Обычно 1.05–1.2.">?</span></label>
+          <input id="k_subst" type="number" min="0" step="0.05">
+        </div>
+        <div class="field">
+          <label for="k_usl_subst">Коэффициент условий труда (замещение) <span class="info" tabindex="0" data-tooltip="Особые условия при замещении. Обычно 1.0–1.2.">?</span></label>
+          <input id="k_usl_subst" type="number" min="0" step="0.05">
+        </div>
+        <div class="field">
+          <label for="u_value">Стоимость ученика-часа, ₽</label>
+          <input id="u_value" type="number" min="0" step="1">
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Доплаты</h2>
+      <div class="checkbox-row">
+        <input id="use_compensations" type="checkbox" checked>
+        <label for="use_compensations" style="margin:0">Учитывать компенсационные выплаты</label>
+      </div>
+      <div class="field">
+        <label for="compensations_sum">Суммарные компенсационные выплаты в месяц, ₽</label>
+        <input id="compensations_sum" type="number" min="0" step="100">
+      </div>
+
+      <div class="checkbox-row" style="margin-top:4px">
+        <input id="use_stim" type="checkbox" checked>
+        <label for="use_stim" style="margin:0">Учитывать стимулирующие выплаты</label>
+      </div>
+      <div class="field">
+        <label for="stim_sum">Суммарные стимулирующие выплаты в месяц, ₽</label>
+        <input id="stim_sum" type="number" min="0" step="100">
+      </div>
+    </section>
+
+    <section>
+      <h2>Расшифровка</h2>
+      <details open>
+        <summary>Оклад логопеда</summary>
+        <div class="accordion-content" id="logoped_breakdown"></div>
+      </details>
+      <details>
+        <summary>Замещающие уроки</summary>
+        <div class="accordion-content" id="substitution_breakdown"></div>
+      </details>
+      <details>
+        <summary>Компенсации и стимулирующие</summary>
+        <div class="accordion-content" id="extras_breakdown"></div>
+      </details>
+      <div class="buttons">
+        <button class="btn-secondary" id="reset_btn" type="button">Сбросить к значениям по умолчанию</button>
+        <button class="btn-primary" id="copy_btn" type="button">Скопировать результат</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const defaults = {
+      weeks_in_month: 4.33,
+      t_logoped: 70000,
+      logoped_share: 1.0,
+      k_cat: 1.0,
+      k_staj: 1.1,
+      k_usl_log: 1.0,
+      use_substitution: true,
+      h_subst: 12,
+      n_students: 8,
+      k_corr: 1.3,
+      k_subst: 1.1,
+      k_usl_subst: 1.0,
+      u_value: 37,
+      use_compensations: true,
+      compensations_sum: 0,
+      use_stim: true,
+      stim_sum: 0,
+    };
+
+    const inputs = {
+      weeks_in_month: document.getElementById('weeks_in_month'),
+      t_logoped: document.getElementById('t_logoped'),
+      logoped_share: document.getElementById('logoped_share'),
+      k_cat: document.getElementById('k_cat'),
+      k_staj: document.getElementById('k_staj'),
+      k_usl_log: document.getElementById('k_usl_log'),
+      use_substitution: document.getElementById('use_substitution'),
+      h_subst: document.getElementById('h_subst'),
+      n_students: document.getElementById('n_students'),
+      k_corr: document.getElementById('k_corr'),
+      k_subst: document.getElementById('k_subst'),
+      k_usl_subst: document.getElementById('k_usl_subst'),
+      u_value: document.getElementById('u_value'),
+      use_compensations: document.getElementById('use_compensations'),
+      compensations_sum: document.getElementById('compensations_sum'),
+      use_stim: document.getElementById('use_stim'),
+      stim_sum: document.getElementById('stim_sum'),
+    };
+
+    const summaryDisplay = document.getElementById('total_display');
+    const summaryBreakdown = document.getElementById('summary_breakdown');
+    const logopedBreakdown = document.getElementById('logoped_breakdown');
+    const substitutionBreakdown = document.getElementById('substitution_breakdown');
+    const extrasBreakdown = document.getElementById('extras_breakdown');
+    const substitutionBlock = document.getElementById('substitution_block');
+    const resetBtn = document.getElementById('reset_btn');
+    const copyBtn = document.getElementById('copy_btn');
+
+    function formatMoney(value) {
+      return `${value.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`;
+    }
+
+    function parseNumber(input) {
+      const value = parseFloat(input.value);
+      const valid = Number.isFinite(value) && value >= 0;
+      input.classList.toggle('invalid', !valid);
+      return valid ? value : 0;
+    }
+
+    function setDefaults() {
+      Object.entries(defaults).forEach(([key, value]) => {
+        const field = inputs[key];
+        if (!field) return;
+        if (field.type === 'checkbox') {
+          field.checked = Boolean(value);
+        } else {
+          field.value = value;
+        }
+      });
+      handleToggles();
+      recalc();
+    }
+
+    function handleToggles() {
+      const substitutionEnabled = inputs.use_substitution.checked;
+      [...substitutionBlock.querySelectorAll('input')].forEach((el) => {
+        if (el.id !== 'use_substitution') {
+          el.disabled = !substitutionEnabled;
+        }
+      });
+
+      const compensationEnabled = inputs.use_compensations.checked;
+      inputs.compensations_sum.disabled = !compensationEnabled;
+
+      const stimEnabled = inputs.use_stim.checked;
+      inputs.stim_sum.disabled = !stimEnabled;
+    }
+
+    function recalc() {
+      const weeksInMonth = parseNumber(inputs.weeks_in_month);
+      const tLogoped = parseNumber(inputs.t_logoped);
+      const share = parseNumber(inputs.logoped_share);
+      const kCat = parseNumber(inputs.k_cat);
+      const kStaj = parseNumber(inputs.k_staj);
+      const kUslLog = parseNumber(inputs.k_usl_log);
+
+      const baseOklad = tLogoped * share;
+      const zLogoped = baseOklad * kCat * kStaj * kUslLog;
+
+      const useSubst = inputs.use_substitution.checked;
+      const hSubst = useSubst ? parseNumber(inputs.h_subst) : 0;
+      const nStudents = useSubst ? parseNumber(inputs.n_students) : 0;
+      const kCorr = useSubst ? parseNumber(inputs.k_corr) : 0;
+      const kSubst = useSubst ? parseNumber(inputs.k_subst) : 0;
+      const kUslSubst = useSubst ? parseNumber(inputs.k_usl_subst) : 0;
+      const uValue = useSubst ? parseNumber(inputs.u_value) : 0;
+
+      const cHour = useSubst ? uValue * nStudents * kCorr * kSubst * kUslSubst : 0;
+      const zSubst = hSubst * cHour;
+
+      const useComp = inputs.use_compensations.checked;
+      const zComp = useComp ? parseNumber(inputs.compensations_sum) : 0;
+
+      const useStim = inputs.use_stim.checked;
+      const zStim = useStim ? parseNumber(inputs.stim_sum) : 0;
+
+      const total = zLogoped + zSubst + zComp + zStim;
+
+      summaryDisplay.textContent = `Итоговая сумма за месяц: ${formatMoney(total)}`;
+      summaryBreakdown.innerHTML = `
+        Оклад логопеда: <strong>${formatMoney(zLogoped)}</strong><br>
+        Замещение: <strong>${formatMoney(zSubst)}</strong><br>
+        Компенсации: <strong>${formatMoney(zComp)}</strong><br>
+        Стимулирующие: <strong>${formatMoney(zStim)}</strong>
+      `;
+
+      logopedBreakdown.innerHTML = `
+        Формула: Оклад = Оклад_ставка × Доля_ставки × K_кат × K_стаж × K_усл_лог<br>
+        = ${formatMoney(tLogoped)} × ${share.toFixed(2)} × ${kCat.toFixed(2)} × ${kStaj.toFixed(2)} × ${kUslLog.toFixed(2)}<br>
+        = <strong>${formatMoney(zLogoped)}</strong>
+      `;
+
+      substitutionBreakdown.innerHTML = useSubst ? `
+        Стоимость часа: C_ч = U × N_учеников × K_corr × K_subst × K_усл_subst<br>
+        = ${formatMoney(uValue)} × ${nStudents.toFixed(0)} × ${kCorr.toFixed(2)} × ${kSubst.toFixed(2)} × ${kUslSubst.toFixed(2)}<br>
+        = <strong>${formatMoney(cHour)}</strong><br><br>
+        Итог за месяц: Z_subst = H_subst × C_ч = ${hSubst.toFixed(0)} × ${formatMoney(cHour)}<br>
+        = <strong>${formatMoney(zSubst)}</strong>
+      ` : 'Замещение не учитывается.';
+
+      extrasBreakdown.innerHTML = `
+        Компенсации: ${useComp ? 'учитываются' : 'не учитываются'} — <strong>${formatMoney(zComp)}</strong><br>
+        Стимулирующие: ${useStim ? 'учитываются' : 'не учитываются'} — <strong>${formatMoney(zStim)}</strong>
+      `;
+    }
+
+    function attachListeners() {
+      Object.values(inputs).forEach((el) => {
+        el.addEventListener('input', () => {
+          handleToggles();
+          recalc();
+        });
+        el.addEventListener('change', () => {
+          handleToggles();
+          recalc();
+        });
+      });
+
+      resetBtn.addEventListener('click', setDefaults);
+
+      copyBtn.addEventListener('click', async () => {
+        const text = `Итоговая сумма: ${summaryDisplay.textContent.replace('Итоговая сумма за месяц: ', '')}\n` +
+          summaryBreakdown.innerText.replace(/\s+/g, ' ').trim();
+        try {
+          await navigator.clipboard.writeText(text);
+          copyBtn.textContent = 'Скопировано!';
+          setTimeout(() => copyBtn.textContent = 'Скопировать результат', 1500);
+        } catch (e) {
+          copyBtn.textContent = 'Не удалось скопировать';
+          setTimeout(() => copyBtn.textContent = 'Скопировать результат', 1500);
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setDefaults();
+      attachListeners();
+    });
+  </script>
+</body>
+</html>
