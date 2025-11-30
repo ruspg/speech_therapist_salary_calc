@@ -6,7 +6,7 @@
   <title>Калькулятор оплаты логопеда</title>
   <style>
     :root {
-      --bg: #f5f7fa;
+      --bg: #f4f5f7;
       --card: #ffffff;
       --text: #1c252e;
       --accent: #216869;
@@ -46,13 +46,17 @@
     }
 
     h1 {
-      margin: 0 0 12px;
-      font-size: 24px;
+      margin: 0 0 10px;
+      font-size: 26px;
+      font-weight: 800;
+      color: #0f172a;
     }
 
     h2 {
       margin: 0 0 12px;
-      font-size: 18px;
+      font-size: 19px;
+      font-weight: 700;
+      color: #111827;
     }
 
     section {
@@ -72,13 +76,9 @@
     }
 
     .summary-bar {
-      background: linear-gradient(135deg, var(--accent), #3aafa9);
+      background: linear-gradient(135deg, rgba(33, 104, 105, 0.92), rgba(58, 175, 169, 0.9));
       color: #fff;
       border: none;
-      position: sticky;
-      top: 0;
-      inset-inline: 0;
-      z-index: 20;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
       border-radius: 12px;
       padding: 16px;
@@ -114,11 +114,23 @@
       flex-direction: column;
       gap: 4px;
       min-height: 72px;
+      backdrop-filter: blur(2px);
     }
 
     .summary-chip.primary {
-      background: rgba(255, 255, 255, 0.18);
-      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.24);
+      border-color: rgba(255, 255, 255, 0.6);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    }
+
+    .summary-chip.primary .label {
+      opacity: 1;
+      letter-spacing: 0.04em;
+    }
+
+    .summary-chip.primary .value {
+      font-size: 24px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
     .summary-chip .label {
@@ -147,6 +159,81 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
+    .summary-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .summary-section + .summary-section {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .summary-section-title {
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: #52606d;
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .summary-row .label {
+      font-weight: 600;
+      color: #1f2933;
+    }
+
+    .summary-money {
+      font-weight: 800;
+    }
+
+    .summary-subrow {
+      margin-left: 8px;
+      color: #52606d;
+      font-size: 13px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .summary-subrow .label {
+      font-weight: 700;
+      color: #1f2933;
+    }
+
+    .summary-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      background: #f0f4f8;
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .share-chip {
+      background: #e8f5f1;
+      border-color: #b5e0d3;
+      color: #0f9151;
+    }
+
+    .delta-positive.summary-tag,
+    .delta-negative.summary-tag {
+      border-color: transparent;
+    }
+
     .field {
       display: flex;
       flex-direction: column;
@@ -165,16 +252,20 @@
       background: var(--accent-soft);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 6px 8px;
+      padding: 6px 10px;
       font-weight: 700;
       font-size: 12px;
       color: var(--text);
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     label {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 600;
+      color: #475569;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -208,10 +299,188 @@
       font-weight: 600;
     }
 
+    .toggle-row {
+      justify-content: space-between;
+    }
+
+    .toggle-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      color: #1f2933;
+      position: relative;
+      user-select: none;
+    }
+
+    .toggle-control input {
+      position: absolute;
+      opacity: 0;
+      inset: 0;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .toggle-slider {
+      width: 46px;
+      height: 26px;
+      background: #d7e1e9;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      position: relative;
+      transition: background 0.2s ease, border-color 0.2s ease;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+    }
+
+    .toggle-slider::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .toggle-control input:checked + .toggle-slider {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 4px 10px rgba(33, 104, 105, 0.24);
+    }
+
+    .toggle-control input:checked + .toggle-slider::after {
+      transform: translateX(18px);
+    }
+
+    .toggle-control input:focus-visible + .toggle-slider {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+      box-shadow: 0 0 0 3px rgba(19, 78, 74, 0.15);
+    }
+
+    .toggle-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1f2933;
+    }
+
+    .toggle-control input:not(:checked) ~ .toggle-text {
+      color: #52606d;
+      font-weight: 600;
+    }
+
+    .toggle-section {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      padding: 12px 12px 8px;
+      transition: background 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+    }
+
+    #use_teacher_load:not(:checked) ~ #teacher_block,
+    #use_extra_subst:not(:checked) ~ #extra_subst_block {
+      background: #f3f5f8;
+      opacity: 0.6;
+      filter: grayscale(0.08);
+    }
+
+    #teacher_block.hidden {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .field {
+        margin-bottom: 16px;
+      }
+
+      .input-with-unit {
+        gap: 10px;
+      }
+
+    }
+
     .sub-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 10px 12px;
+    }
+
+    .teacher-line {
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #ffffff;
+      position: relative;
+    }
+
+    .teacher-line:nth-child(odd) {
+      background: #f8fbff;
+    }
+
+    .teacher-line:nth-child(even) {
+      background: #ffffff;
+    }
+
+    .teacher-line .teacher-main label,
+    .teacher-line .teacher-hours label {
+      font-weight: 700;
+    }
+
+    .teacher-line .teacher-coef label {
+      font-size: 13px;
+      color: #52606d;
+    }
+
+    .teacher-line .teacher-actions {
+      align-self: flex-end;
+    }
+
+    @media (max-width: 768px) {
+      .teacher-line {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "subject"
+          "hours"
+          "kdiv"
+          "ksubj"
+          "actions";
+        gap: 10px;
+      }
+
+      .teacher-line .teacher-main {
+        grid-area: subject;
+      }
+
+      .teacher-line .teacher-hours {
+        grid-area: hours;
+      }
+
+      .teacher-line .k-div-field {
+        grid-area: kdiv;
+      }
+
+      .teacher-line .k-subj-field {
+        grid-area: ksubj;
+      }
+
+      .teacher-line .teacher-actions {
+        grid-area: actions;
+        justify-self: flex-start;
+      }
+
+      .teacher-line .teacher-main label,
+      .teacher-line .teacher-hours label {
+        font-size: 15px;
+      }
+
+      .teacher-line .teacher-coef label {
+        font-size: 13px;
+      }
     }
 
     details {
@@ -230,6 +499,37 @@
 
     details summary::-webkit-details-marker {
       display: none;
+    }
+
+    .collapsible-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      padding: 0;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .collapsible-card summary {
+      padding: 14px 16px;
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .collapsible-card summary h2 {
+      margin: 0;
+      font-size: inherit;
+    }
+
+    .collapsible-card[open] summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .collapsible-card .collapsible-body {
+      padding: 12px 16px 14px;
     }
 
     .hidden {
@@ -401,8 +701,16 @@
     }
 
     .muted {
-      color: #52606d;
-      font-size: 14px;
+      color: #66788a;
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    .section-note {
+      color: #6b7280;
+      font-size: 12.5px;
+      font-style: italic;
+      margin-top: -4px;
     }
 
     .warning-text {
@@ -422,6 +730,20 @@
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+      .summary {
+        position: sticky;
+        top: calc(env(safe-area-inset-top, 0px));
+        z-index: 25;
+        padding-top: 4px;
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.12));
+      }
+
+      .summary-bar {
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
+      }
     }
 
     @media (max-width: 420px) {
@@ -525,7 +847,7 @@
       <div class="field">
         <label for="t_logoped">Оклад логопеда за 1 ставку (O_logoped_base) <span class="info" tabindex="0" data-tooltip="Размер оклада логопеда за полную ставку из трудового договора, до удержаний НДФЛ. (base salary)">?</span></label>
         <div class="input-with-unit">
-          <input id="t_logoped" type="number" min="0" step="100">
+          <input id="t_logoped" type="number" min="0" step="1">
           <span class="unit-badge">₽/мес</span>
         </div>
       </div>
@@ -542,18 +864,21 @@
     <section>
       <h2>Учебная нагрузка как учитель <span class="info" tabindex="0" data-tooltip="Расчёт оплаты уроков: укажите численность, часы в неделю и коэффициенты из формулы 3.9. (teaching load)">?</span></h2>
       <p class="section-note">Этот блок помогает проверить расчёт суммы в дополнительном соглашении, где указан оклад за учебную нагрузку. Можно сравнить сумму по договору и сумму по формуле 3.9 (ученико-час).</p>
-      <div class="checkbox-row">
-        <input id="use_teacher_load" type="checkbox" checked>
-        <label for="use_teacher_load" style="margin:0">Учитывать учебную нагрузку</label>
+      <div class="checkbox-row toggle-row">
+        <label class="toggle-control" for="use_teacher_load">
+          <input id="use_teacher_load" type="checkbox" checked>
+          <span class="toggle-slider" aria-hidden="true"></span>
+          <span class="toggle-text">Учитывать учебную нагрузку</span>
+        </label>
       </div>
-      <div id="teacher_block">
-        <div class="field">
-          <label for="o_teacher_contract">Оклад за учебную нагрузку по договору, ₽</label>
-          <div class="input-with-unit">
-            <input id="o_teacher_contract" type="number" min="0" step="0.01">
-            <span class="unit-badge">₽/мес</span>
+        <div id="teacher_block" class="toggle-section">
+          <div class="field">
+            <label for="o_teacher_contract">Оклад за учебную нагрузку по договору</label>
+            <div class="input-with-unit">
+              <input id="o_teacher_contract" type="number" min="0" step="0.01">
+              <span class="unit-badge">₽/мес</span>
+            </div>
           </div>
-        </div>
         <div class="field">
           <label>Состав класса (количество обучающихся) <span class="info" tabindex="0" data-tooltip="Сколько учеников в группах разных уровней: A1 слабый, A2 средний, A3 сильный. (class composition)">?</span></label>
           <div class="sub-grid">
@@ -623,11 +948,14 @@
       <p class="section-note">Этот блок считает дополнительные замены сверх вашей тарификации. Здесь учитываются уроки, которые вы ведёте за коллег по приказу или по ставке ученико-часа, отдельно от оклада по договору.</p>
       <div id="substitution_warning" class="warning-text" aria-live="polite"></div>
       <div id="extra_subst_warning" class="warning-text warning" aria-live="polite"></div>
-      <div class="checkbox-row" style="margin-top:4px">
-        <input id="use_extra_subst" type="checkbox">
-        <label for="use_extra_subst" style="margin:0">Учитывать дополнительное замещение</label>
+      <div class="checkbox-row toggle-row" style="margin-top:4px">
+        <label class="toggle-control" for="use_extra_subst">
+          <input id="use_extra_subst" type="checkbox">
+          <span class="toggle-slider" aria-hidden="true"></span>
+          <span class="toggle-text">Учитывать дополнительное замещение</span>
+        </label>
       </div>
-      <div class="sub-grid" id="extra_subst_block">
+      <div class="sub-grid toggle-section" id="extra_subst_block">
         <div class="field">
           <label for="h_sub_extra">Дополнительные часы (H_sub_extra)</label>
           <div class="input-with-unit">
@@ -650,7 +978,7 @@
           </div>
         </div>
         <div class="field">
-          <label for="r_sub_extra">Ставка по приказу (R_sub_extra), ₽</label>
+          <label for="r_sub_extra">Ставка по приказу (R_sub_extra)</label>
           <div class="input-with-unit">
             <input id="r_sub_extra" type="number" min="0" step="1">
             <span class="unit-badge">₽/урок</span>
@@ -696,21 +1024,21 @@
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
-          <label for="comp_other">Прочие компенсации (Comp_other), ₽</label>
+          <label for="comp_other">Прочие компенсации (Comp_other)</label>
           <div class="input-with-unit">
-            <input id="comp_other" type="number" min="0" step="100">
+            <input id="comp_other" type="number" min="0" step="1">
             <span class="unit-badge">₽/мес</span>
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
-          <label for="comp_ovz">Компенсация за ОВЗ (Comp_OVZ), ₽</label>
+          <label for="comp_ovz">Компенсация за ОВЗ (Comp_OVZ)</label>
           <div class="input-with-unit">
             <input id="comp_ovz" type="number" readonly>
             <span class="unit-badge">₽/мес</span>
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
-          <label for="comp_total">Итоговые компенсации (Comp_total), ₽</label>
+          <label for="comp_total">Итоговые компенсации (Comp_total)</label>
           <div class="input-with-unit">
             <input id="comp_total" type="number" readonly>
             <span class="unit-badge">₽/мес</span>
@@ -731,27 +1059,27 @@
           <div class="field" style="margin-bottom:0">
             <label for="stim_part1">Стабильная стимулирующая (Stim_month) <span class="info" tabindex="0" data-tooltip="Ежемесячная фиксированная стимулирующая выплата, включая стабильную часть. (stable bonus)">?</span></label>
             <div class="input-with-unit">
-              <input id="stim_part1" type="number" min="0" step="100">
+              <input id="stim_part1" type="number" min="0" step="1">
               <span class="unit-badge">₽/мес</span>
             </div>
           </div>
           <div class="field" style="margin-bottom:0">
-            <label for="stim_part2">Стимулирующая часть 2, ₽</label>
+            <label for="stim_part2">Стимулирующая часть 2</label>
             <div class="input-with-unit">
-              <input id="stim_part2" type="number" min="0" step="100">
+              <input id="stim_part2" type="number" min="0" step="1">
               <span class="unit-badge">₽/мес</span>
             </div>
           </div>
           <div class="field" style="margin-bottom:0">
-            <label for="stim_part3">Стимулирующая часть 3, ₽</label>
+            <label for="stim_part3">Стимулирующая часть 3</label>
             <div class="input-with-unit">
-              <input id="stim_part3" type="number" min="0" step="100">
+              <input id="stim_part3" type="number" min="0" step="1">
               <span class="unit-badge">₽/мес</span>
             </div>
           </div>
         </div>
         <div class="field" style="margin-top:10px">
-          <label for="stim_total">Stim_total, ₽</label>
+          <label for="stim_total">Stim_total</label>
           <div class="input-with-unit">
             <input id="stim_total" type="number" readonly>
             <span class="unit-badge">₽/мес</span>
@@ -764,28 +1092,28 @@
       <h2>Налоги и удержания</h2>
       <div class="sub-grid">
         <div class="field" style="margin-bottom:0">
-          <label for="ndfl_rate">Ставка НДФЛ, %</label>
+          <label for="ndfl_rate">Ставка НДФЛ (Ndfl_rate)</label>
           <div class="input-with-unit">
             <input id="ndfl_rate" type="number" min="0" max="100" step="0.1">
             <span class="unit-badge">%</span>
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
-          <label for="other_withholdings">Прочие удержания, ₽</label>
+          <label for="other_withholdings">Прочие удержания (Other_withholdings)</label>
           <div class="input-with-unit">
-            <input id="other_withholdings" type="number" min="0" step="100">
+            <input id="other_withholdings" type="number" min="0" step="1">
             <span class="unit-badge">₽/мес</span>
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
-          <label for="ndfl_amount">Ndfl_amount, ₽</label>
+          <label for="ndfl_amount">Ndfl_amount</label>
           <div class="input-with-unit">
             <input id="ndfl_amount" type="number" readonly>
             <span class="unit-badge">₽</span>
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
-          <label for="total_withhold">Total_withhold, ₽</label>
+          <label for="total_withhold">Total_withhold</label>
           <div class="input-with-unit">
             <input id="total_withhold" type="number" readonly>
             <span class="unit-badge">₽</span>
@@ -794,10 +1122,9 @@
       </div>
     </section>
 
-    <section>
-      <h2>Помощь и нормативные документы</h2>
-      <details>
-        <summary>Открыть справку</summary>
+    <details class="collapsible-card">
+      <summary><h2>Помощь и нормативные документы</h2></summary>
+      <div class="collapsible-body">
         <div class="accordion-content">
           <p>Ключевые подсказки для корректного ввода данных:</p>
           <ul>
@@ -807,44 +1134,46 @@
           </ul>
           <p class="muted">Приказ об оплате труда, Положение о стимулирующих и локальные нормативные акты школы помогут быстро заполнить форму.</p>
         </div>
-      </details>
-    </section>
-
-    <section>
-      <h2>Итоги и расшифровка</h2>
-      <details open>
-        <summary>Краткие итоги</summary>
-        <div class="accordion-content" id="totals_breakdown"></div>
-      </details>
-      <details>
-        <summary>Оклад логопеда</summary>
-        <div class="accordion-content" id="logoped_breakdown"></div>
-      </details>
-      <details>
-        <summary>Учебная нагрузка</summary>
-        <div class="accordion-content" id="teacher_breakdown"></div>
-      </details>
-      <details>
-        <summary>Разовые замены</summary>
-        <div class="accordion-content" id="substitution_breakdown"></div>
-      </details>
-      <details>
-        <summary>Компенсации</summary>
-        <div class="accordion-content" id="comp_breakdown"></div>
-      </details>
-      <details>
-        <summary>Стимулирующие выплаты</summary>
-        <div class="accordion-content" id="stim_breakdown"></div>
-      </details>
-      <details>
-        <summary>Налоги и удержания</summary>
-        <div class="accordion-content" id="taxes_breakdown"></div>
-      </details>
-      <div class="buttons">
-        <button class="btn-secondary" id="reset_btn" type="button">Сбросить к значениям по умолчанию</button>
-        <button class="btn-primary" id="copy_btn" type="button">Скопировать результат</button>
       </div>
-    </section>
+    </details>
+
+    <details class="collapsible-card">
+      <summary><h2>Итоги и расшифровка</h2></summary>
+      <div class="collapsible-body">
+        <details>
+          <summary>Краткие итоги</summary>
+          <div class="accordion-content" id="totals_breakdown"></div>
+        </details>
+        <details>
+          <summary>Оклад логопеда</summary>
+          <div class="accordion-content" id="logoped_breakdown"></div>
+        </details>
+        <details>
+          <summary>Учебная нагрузка</summary>
+          <div class="accordion-content" id="teacher_breakdown"></div>
+        </details>
+        <details>
+          <summary>Разовые замены</summary>
+          <div class="accordion-content" id="substitution_breakdown"></div>
+        </details>
+        <details>
+          <summary>Компенсации</summary>
+          <div class="accordion-content" id="comp_breakdown"></div>
+        </details>
+        <details>
+          <summary>Стимулирующие выплаты</summary>
+          <div class="accordion-content" id="stim_breakdown"></div>
+        </details>
+        <details>
+          <summary>Налоги и удержания</summary>
+          <div class="accordion-content" id="taxes_breakdown"></div>
+        </details>
+        <div class="buttons">
+          <button class="btn-secondary" id="reset_btn" type="button">Сбросить к значениям по умолчанию</button>
+          <button class="btn-primary" id="copy_btn" type="button">Скопировать результат</button>
+        </div>
+      </div>
+    </details>
   </div>
 
   <script>
@@ -1034,7 +1363,7 @@
       c_stu: { min: 0, max: 1000, step: 1, label: 'C_stu' },
       weeks_year: { min: 1, max: 52, step: 1, label: 'Weeks_year' },
       months_year: { min: 1, max: 12, step: 1, label: 'Months_year' },
-      t_logoped: { min: 0, max: 500000, step: 100, label: 'Оклад логопеда' },
+      t_logoped: { min: 0, max: 500000, step: 1, label: 'Оклад логопеда' },
       logoped_share: { min: 0, max: 1, step: 0.25, label: 'Доля ставки' },
       o_teacher_contract: { min: 0, max: 500000, step: 0.01, label: 'O_teacher_contract' },
       a1: { min: 0, max: 40, step: 1, label: 'A1' },
@@ -1042,20 +1371,20 @@
       a3: { min: 0, max: 40, step: 1, label: 'A3' },
       u_value: { min: 0, max: 1000, step: 1, label: 'U' },
       h_sub_extra: { min: 0, max: 200, step: 1, label: 'H_sub_extra' },
-      r_sub_extra: { min: 0, max: 20000, step: 50, label: 'R_sub_extra' },
+      r_sub_extra: { min: 0, max: 20000, step: 1, label: 'R_sub_extra' },
       n_class_subst: { min: 0, max: 35, step: 1, label: 'N_class_subst' },
       k_ovz: { min: 0, max: 100, step: 1, label: 'K_OVZ' },
-      comp_other: { min: 0, max: 500000, step: 100, label: 'Comp_other' },
-      stim_part1: { min: 0, max: 300000, step: 100, label: 'Stim_part1' },
-      stim_part2: { min: 0, max: 300000, step: 100, label: 'Stim_part2' },
-      stim_part3: { min: 0, max: 300000, step: 100, label: 'Stim_part3' },
+      comp_other: { min: 0, max: 500000, step: 1, label: 'Comp_other' },
+      stim_part1: { min: 0, max: 300000, step: 1, label: 'Stim_part1' },
+      stim_part2: { min: 0, max: 300000, step: 1, label: 'Stim_part2' },
+      stim_part3: { min: 0, max: 300000, step: 1, label: 'Stim_part3' },
       ndfl_rate: { min: 0, max: 100, step: 0.1, label: 'Ставка НДФЛ' },
-      other_withholdings: { min: 0, max: 500000, step: 100, label: 'Прочие удержания' },
+      other_withholdings: { min: 0, max: 500000, step: 1, label: 'Прочие удержания' },
     };
 
     const teacherLineRules = {
       t_week: { min: 0, max: 40, step: 0.25, label: 't_week' },
-      k_div: { min: 1, max: 10, step: 0.1, label: 'K_div' },
+      k_div: { min: 1, max: 10, step: 0.01, label: 'K_div' },
       k_subj: { min: 1, max: 5, step: 0.1, label: 'K_subj' },
     };
 
@@ -1230,7 +1559,7 @@
         wrapper.dataset.lineId = line.id;
 
         const subjectField = document.createElement('div');
-        subjectField.className = 'field';
+        subjectField.className = 'field teacher-main';
         const subjectLabel = document.createElement('label');
         subjectLabel.textContent = 'Предмет';
         const subjectInput = document.createElement('input');
@@ -1245,7 +1574,7 @@
         subjectField.append(subjectLabel, subjectInput);
 
         const hoursField = document.createElement('div');
-        hoursField.className = 'field';
+        hoursField.className = 'field teacher-hours';
         const hoursLabel = document.createElement('label');
         hoursLabel.textContent = 'Часов в неделю (t_week)';
         const hoursInput = document.createElement('input');
@@ -1263,9 +1592,9 @@
         hoursField.append(hoursLabel, wrapWithUnit(hoursInput, 'ч/нед'));
 
         const kDivField = document.createElement('div');
-        kDivField.className = 'field';
+        kDivField.className = 'field teacher-coef k-div-field';
         const kDivLabel = document.createElement('label');
-        kDivLabel.innerHTML = 'K_div <span class="info" tabindex="0" data-tooltip="Коэффициент деления класса на группы; выше 1, если класс делится. (K_div)">?</span>';
+        kDivLabel.innerHTML = 'K_div <span class="info" tabindex="0" data-tooltip="Коэффициент деления класса на группы. Обычно считается как 25 / число учеников; для 4 учеников получается 6,25. (K_div)">?</span>';
         const kDivInput = document.createElement('input');
         kDivInput.type = 'number';
         kDivInput.min = '1';
@@ -1281,7 +1610,7 @@
         kDivField.append(kDivLabel, wrapWithUnit(kDivInput, 'коэфф.'));
 
         const kSubjField = document.createElement('div');
-        kSubjField.className = 'field';
+        kSubjField.className = 'field teacher-coef k-subj-field';
         const kSubjLabel = document.createElement('label');
         kSubjLabel.innerHTML = 'K_subj <span class="info" tabindex="0" data-tooltip="Коэффициент предмета: надбавка за сложность или приоритет предмета. (K_subj)">?</span>';
         const kSubjInput = document.createElement('input');
@@ -1299,7 +1628,7 @@
         kSubjField.append(kSubjLabel, wrapWithUnit(kSubjInput, 'коэфф.'));
 
         const removeField = document.createElement('div');
-        removeField.className = 'field';
+        removeField.className = 'field teacher-actions';
         const removeLabel = document.createElement('label');
         removeLabel.textContent = 'Удалить строку';
         const removeBtn = document.createElement('button');
@@ -1541,7 +1870,7 @@
       ` : 'Дополнительное замещение не учитывается.';
 
       const substitutionStatsText = `
-        Share_subst_percent = ${shareSubstPercent === null ? '—' : `<strong>${formatPercent(shareSubstPercent)}</strong>`}<br>
+        Share_subst_percent = ${shareSubstPercent === null ? '—' : `<span class="summary-tag share-chip">${formatPercent(shareSubstPercent)}</span>`}<br>
         Subst_hour_net = ${substHourNet === null ? '—' : `<strong>${formatMoney(substHourNet)}</strong>`}
       `;
 
@@ -1694,18 +2023,41 @@
     });
 
     function buildSummaryHtml(data) {
+      const deltaClass = data.teacherDelta > 0 ? 'delta-positive' : data.teacherDelta < 0 ? 'delta-negative' : '';
+      const shareChip = data.shareSubstPercent === null
+        ? '—'
+        : `<span class="summary-tag share-chip">${formatPercent(data.shareSubstPercent)}</span>`;
+
       return `
-        <strong>Оклад логопеда:</strong> ${formatMoney(data.baseOklad)}<br>
-        <strong>Учебная нагрузка по договору:</strong> ${formatMoney(data.teacherContract)}<br>
-        <strong>Учебная нагрузка по формуле:</strong> ${formatMoney(data.teacherCalc)}<br>
-        <strong>Разница по нагрузке:</strong> ${formatSignedMoney(data.teacherDelta)}<br>
-        <strong>Дополнительные замены:</strong> ${formatMoney(data.extraSubstitution)}<br>
-        <strong>Компенсации:</strong> всего — ${formatMoney(data.compTotal)}, ОВЗ — ${formatMoney(data.compOvz)}, прочие — ${formatMoney(data.compOther)}<br>
-        <strong>Стимулирующие выплаты:</strong> ${formatMoney(data.stimTotal)}<br>
-        <strong>Налоги и удержания:</strong> НДФЛ ${formatPercent(data.ndflRate, { minimumFractionDigits: 0, maximumFractionDigits: 1 })} — ${formatMoney(data.ndflAmount)}, прочие — ${formatMoney(data.otherWithholdings)}, всего — ${formatMoney(data.totalWithhold)}<br>
-        <strong>Итоги:</strong> начислено — ${formatMoney(data.grossSalary)}, на руки — ${formatMoney(data.netSalary)}<br>
-        Доля разовых замен в начислениях: <strong>${data.shareSubstPercent === null ? '—' : formatPercent(data.shareSubstPercent)}</strong><br>
-        Цена 1 часа доп. замены «на руки»: <strong>${data.substHourNet === null ? '—' : formatMoney(data.substHourNet)}</strong>
+        <div class="summary-section">
+          <div class="summary-section-title">Окладная часть</div>
+          <div class="summary-row"><span class="label">Оклад логопеда (Base_logoped)</span><span class="summary-money">${formatMoney(data.baseOklad)}</span></div>
+          <div class="summary-row"><span class="label">Учебная нагрузка по договору (O_teacher_contract)</span><span class="summary-money">${formatMoney(data.teacherContract)}</span></div>
+          <div class="summary-row"><span class="label">Учебная нагрузка по формуле (O_teacher_calc)</span><span class="summary-money">${formatMoney(data.teacherCalc)}</span></div>
+          <div class="summary-row"><span class="label">Δ по нагрузке (Delta_teacher)</span><span class="summary-money"><span class="summary-tag ${deltaClass}">${formatSignedMoney(data.teacherDelta)}</span></span></div>
+        </div>
+
+        <div class="summary-section">
+          <div class="summary-section-title">Доплаты</div>
+          <div class="summary-row"><span class="label">Дополнительные замены (Subst_extra)</span><span class="summary-money">${formatMoney(data.extraSubstitution)}</span></div>
+          <div class="summary-row"><span class="label">Компенсации (Comp_total)</span><span class="summary-money">${formatMoney(data.compTotal)}</span></div>
+          <div class="summary-subrow">ОВЗ — ${formatMoney(data.compOvz)} · Прочие — ${formatMoney(data.compOther)}</div>
+          <div class="summary-row"><span class="label">Стимулирующие (Stim_total)</span><span class="summary-money">${formatMoney(data.stimTotal)}</span></div>
+        </div>
+
+        <div class="summary-section">
+          <div class="summary-section-title">Налоги и удержания</div>
+          <div class="summary-row"><span class="label">НДФЛ (${formatPercent(data.ndflRate, { minimumFractionDigits: 0, maximumFractionDigits: 1 })})</span><span class="summary-money">${formatMoney(data.ndflAmount)}</span></div>
+          <div class="summary-row"><span class="label">Прочие удержания (Other_withholdings)</span><span class="summary-money">${formatMoney(data.otherWithholdings)}</span></div>
+          <div class="summary-row"><span class="label">Всего удержаний (Total_withhold)</span><span class="summary-money">${formatMoney(data.totalWithhold)}</span></div>
+          <div class="summary-row"><span class="label">Начислено (Gross_salary)</span><span class="summary-money">${formatMoney(data.grossSalary)}</span></div>
+          <div class="summary-row"><span class="label">На руки (Net_salary)</span><span class="summary-money">${formatMoney(data.netSalary)}</span></div>
+        </div>
+
+        <div class="summary-subrow" style="margin-top:10px">
+          <span class="label">Доля разовых замен</span> ${shareChip}
+          <span class="label" style="margin-left:12px">Цена 1 часа доп. замены «на руки»</span> ${data.substHourNet === null ? '—' : `<strong>${formatMoney(data.substHourNet)}</strong>`}
+        </div>
       `;
     }
 
