@@ -249,7 +249,27 @@
       </div>
       <div class="field">
         <label for="period">Период расчёта</label>
-        <input id="period" type="text" value="2025" readonly>
+        <input id="period" type="text" value="2025/2026" readonly>
+      </div>
+      <div class="field">
+        <label for="organization">Организация</label>
+        <input id="organization" type="text" value="ГБОУ Школа № XXXX" readonly>
+      </div>
+      <div class="field">
+        <label for="worker_category">Категория работника</label>
+        <input id="worker_category" type="text" value="Иные педагогические работники (логопед/дефектолог)" readonly>
+      </div>
+      <div class="field">
+        <label for="c_stu">Стоимость 1 ученико-часа (C_stu) <span class="info" tabindex="0" data-tooltip="Нормативная стоимость одного ученико-часа по приказу/Положению об оплате труда.">?</span></label>
+        <input id="c_stu" type="number" min="0" step="1">
+      </div>
+      <div class="field">
+        <label for="weeks_year">Количество учебных недель (Weeks_year)</label>
+        <input id="weeks_year" type="number" min="1" max="52" step="1">
+      </div>
+      <div class="field">
+        <label for="months_year">Количество месяцев в году (Months_year)</label>
+        <input id="months_year" type="number" value="12" readonly>
       </div>
     </section>
 
@@ -365,6 +385,12 @@
 
   <script>
     const defaults = {
+      period: '2025/2026',
+      organization: 'ГБОУ Школа № XXXX',
+      worker_category: 'Иные педагогические работники (логопед/дефектолог)',
+      c_stu: 37,
+      weeks_year: 34,
+      months_year: 12,
       t_logoped: 70000,
       logoped_share: 1.0,
       k_cat: 1.0,
@@ -384,6 +410,12 @@
     };
 
     const inputs = {
+      period: document.getElementById('period'),
+      organization: document.getElementById('organization'),
+      worker_category: document.getElementById('worker_category'),
+      c_stu: document.getElementById('c_stu'),
+      weeks_year: document.getElementById('weeks_year'),
+      months_year: document.getElementById('months_year'),
       t_logoped: document.getElementById('t_logoped'),
       logoped_share: document.getElementById('logoped_share'),
       k_cat: document.getElementById('k_cat'),
