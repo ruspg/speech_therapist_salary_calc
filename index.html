@@ -75,10 +75,6 @@
       background: linear-gradient(135deg, var(--accent), #3aafa9);
       color: #fff;
       border: none;
-      position: sticky;
-      top: 0;
-      inset-inline: 0;
-      z-index: 20;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
       border-radius: 12px;
       padding: 16px;
@@ -509,6 +505,20 @@
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+      .summary {
+        position: sticky;
+        top: calc(env(safe-area-inset-top, 0px));
+        z-index: 25;
+        padding-top: 4px;
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.12));
+      }
+
+      .summary-bar {
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
+      }
     }
 
     @media (max-width: 420px) {
