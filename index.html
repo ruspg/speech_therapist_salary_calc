@@ -445,8 +445,29 @@
         <label for="use_compensations" style="margin:0">Учитывать компенсационные выплаты</label>
       </div>
       <div class="field">
-        <label for="compensations_sum">Суммарные компенсационные выплаты в месяц, ₽</label>
-        <input id="compensations_sum" type="number" min="0" step="100">
+        <label>OVZ_base_mode: база для расчёта компенсации</label>
+        <div class="flex-row" role="radiogroup" aria-label="OVZ_base_mode">
+          <label><input type="radio" name="ovz_base_mode" value="logoped"> Логопедический</label>
+          <label><input type="radio" name="ovz_base_mode" value="combined"> Логопедический + учительский</label>
+        </div>
+      </div>
+      <div class="sub-grid">
+        <div class="field" style="margin-bottom:0">
+          <label for="k_ovz">% K_OVZ (0–20)</label>
+          <input id="k_ovz" type="number" min="0" max="20" step="0.1">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label for="comp_other">Прочие компенсации (Comp_other), ₽</label>
+          <input id="comp_other" type="number" min="0" step="100">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label for="comp_ovz">Компенсация за ОВЗ (Comp_OVZ), ₽</label>
+          <input id="comp_ovz" type="number" readonly>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label for="comp_total">Итоговые компенсации (Comp_total), ₽</label>
+          <input id="comp_total" type="number" readonly>
+        </div>
       </div>
 
       <div class="checkbox-row" style="margin-top:4px">
@@ -513,7 +534,9 @@
       n_class_subst: 0,
       class_type_subst: 'regular',
       use_compensations: true,
-      compensations_sum: 0,
+      ovz_base_mode: 'logoped',
+      k_ovz: 20,
+      comp_other: 0,
       use_stim: true,
       stim_sum: 0,
     };
@@ -545,7 +568,8 @@
       n_class_subst: document.getElementById('n_class_subst'),
       class_type_subst: document.getElementById('class_type_subst'),
       use_compensations: document.getElementById('use_compensations'),
-      compensations_sum: document.getElementById('compensations_sum'),
+      k_ovz: document.getElementById('k_ovz'),
+      comp_other: document.getElementById('comp_other'),
       use_stim: document.getElementById('use_stim'),
       stim_sum: document.getElementById('stim_sum'),
     };
@@ -572,6 +596,9 @@
     const CORRECTION_CLASS_COEF = 1.3;
 
     const substRateRadios = document.querySelectorAll('input[name="subst_rate_mode"]');
+    const ovzBaseRadios = document.querySelectorAll('input[name="ovz_base_mode"]');
+    const compOvzField = document.getElementById('comp_ovz');
+    const compTotalField = document.getElementById('comp_total');
 
     const defaultTeacherLines = [
       { id: crypto.randomUUID(), subject: 'Русский язык (6-р)', t_week: 12, k_div: 6.25, k_subj: 1.1 },
@@ -601,6 +628,9 @@
       });
       substRateRadios.forEach((radio) => {
         radio.checked = radio.value === defaults.subst_rate_mode;
+      });
+      ovzBaseRadios.forEach((radio) => {
+        radio.checked = radio.value === defaults.ovz_base_mode;
       });
       resetTeacherLines();
       handleToggles();
@@ -727,7 +757,13 @@
       });
 
       const compensationEnabled = inputs.use_compensations.checked;
-      inputs.compensations_sum.disabled = !compensationEnabled;
+      inputs.k_ovz.disabled = !compensationEnabled;
+      inputs.comp_other.disabled = !compensationEnabled;
+      compOvzField.disabled = !compensationEnabled;
+      compTotalField.disabled = !compensationEnabled;
+      ovzBaseRadios.forEach((radio) => {
+        radio.disabled = !compensationEnabled;
+      });
 
       const stimEnabled = inputs.use_stim.checked;
       inputs.stim_sum.disabled = !stimEnabled;
@@ -778,7 +814,13 @@
       const zSubstExtra = useExtraSubst && hSubExtra > 0 ? hSubExtra * rSubCurrent : 0;
 
       const useComp = inputs.use_compensations.checked;
-      const zComp = useComp ? parseNumber(inputs.compensations_sum) : 0;
+      const ovzBaseMode = Array.from(ovzBaseRadios).find((radio) => radio.checked)?.value || defaults.ovz_base_mode;
+      const kOvz = useComp ? parseNumber(inputs.k_ovz) : 0;
+      const compOther = useComp ? parseNumber(inputs.comp_other) : 0;
+      const ovzBase = ovzBaseMode === 'combined' ? baseOklad + oTeacherContract : baseOklad;
+      const compOvz = useComp ? ovzBase * (kOvz / 100) : 0;
+      const compTotal = useComp ? compOvz + compOther : 0;
+      const zComp = compTotal;
 
       const useStim = inputs.use_stim.checked;
       const zStim = useStim ? parseNumber(inputs.stim_sum) : 0;
@@ -795,7 +837,9 @@
         Разница (формула − договор): <strong>${formatMoney(teacherDelta)}</strong><br>
         Замещение (базовое): <strong>${formatMoney(zSubst)}</strong><br>
         Замещение (доп.): <strong>${formatMoney(zSubstExtra)}</strong><br>
-        Компенсации: <strong>${formatMoney(zComp)}</strong><br>
+        Компенсация за ОВЗ: <strong>${formatMoney(compOvz)}</strong><br>
+        Прочие компенсации: <strong>${formatMoney(compOther)}</strong><br>
+        Компенсации всего: <strong>${formatMoney(compTotal)}</strong><br>
         Стимулирующие: <strong>${formatMoney(zStim)}</strong>
       `;
 
@@ -836,10 +880,20 @@
 
       substitutionBreakdown.innerHTML = `${baseSubstitutionText}<br><br>${extraSubstitutionText}`;
 
+      const compText = useComp ? `
+        OVZ_base_mode: ${ovzBaseMode === 'combined' ? 'логопедический + учительский' : 'логопедический'}<br>
+        Comp_OVZ = Base × K_OVZ = ${formatMoney(ovzBase)} × ${kOvz.toFixed(2)}% = <strong>${formatMoney(compOvz)}</strong><br>
+        Comp_other = <strong>${formatMoney(compOther)}</strong><br>
+        Comp_total = <strong>${formatMoney(compTotal)}</strong>
+      ` : 'Компенсации не учитываются.';
+
       extrasBreakdown.innerHTML = `
-        Компенсации: ${useComp ? 'учитываются' : 'не учитываются'} — <strong>${formatMoney(zComp)}</strong><br>
+        ${compText}<br>
         Стимулирующие: ${useStim ? 'учитываются' : 'не учитываются'} — <strong>${formatMoney(zStim)}</strong>
       `;
+
+      compOvzField.value = compOvz.toFixed(2);
+      compTotalField.value = compTotal.toFixed(2);
 
       if (baseOklad < MROT && baseOklad > 0) {
         mrotWarning.textContent = `Внимание: расчетный оклад ниже МРОТ (${formatMoney(MROT)}). Проверьте доплаты.`;
@@ -884,6 +938,13 @@
       });
 
       substRateRadios.forEach((radio) => {
+        radio.addEventListener('change', () => {
+          handleToggles();
+          recalc();
+        });
+      });
+
+      ovzBaseRadios.forEach((radio) => {
         radio.addEventListener('change', () => {
           handleToggles();
           recalc();
