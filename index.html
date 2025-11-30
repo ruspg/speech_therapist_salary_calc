@@ -84,6 +84,14 @@
       padding: 16px;
     }
 
+    .sticky-head {
+      position: sticky;
+      top: calc(env(safe-area-inset-top, 0px));
+      z-index: 25;
+      background: inherit;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.12));
+    }
+
     .summary-headline {
       display: flex;
       flex-direction: column;
@@ -733,14 +741,6 @@
     }
 
     @media (max-width: 768px) {
-      .summary {
-        position: sticky;
-        top: calc(env(safe-area-inset-top, 0px));
-        z-index: 25;
-        padding-top: 4px;
-        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.12));
-      }
-
       .summary-bar {
         box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
       }
@@ -783,8 +783,8 @@
     </header>
 
     <section class="summary" aria-live="polite">
-      <div class="summary-bar">
-        <div class="summary-headline">
+      <div class="summary-headline sticky-head">
+        <div class="summary-bar">
           <div class="summary-title">Итоги за месяц</div>
           <div class="summary-grid">
             <div class="summary-chip primary">
