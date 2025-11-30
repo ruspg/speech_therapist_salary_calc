@@ -1678,17 +1678,17 @@
 
     function buildSummaryHtml(data) {
       return `
-        <strong>Оклад логопеда (Base_logoped):</strong> ${formatMoney(data.baseOklad)}<br>
-        <strong>Учебная нагрузка по договору (O_teacher_contract):</strong> ${formatMoney(data.teacherContract)}<br>
-        <strong>Учебная нагрузка по формуле (O_teacher_calc):</strong> ${formatMoney(data.teacherCalc)}<br>
-        <strong>Разница по нагрузке (Delta_teacher):</strong> ${formatSignedMoney(data.teacherDelta)}<br>
-        <strong>Дополнительные замены (Subst_extra):</strong> ${formatMoney(data.extraSubstitution)}<br>
-        <strong>Компенсации:</strong> всего (Comp_total) — ${formatMoney(data.compTotal)}, ОВЗ (Comp_OVZ) — ${formatMoney(data.compOvz)}, прочие (Comp_other) — ${formatMoney(data.compOther)}<br>
-        <strong>Стимулирующие выплаты (Stim_total):</strong> ${formatMoney(data.stimTotal)}<br>
-        <strong>Налоги и удержания:</strong> НДФЛ (Ndfl_amount) ${formatPercent(data.ndflRate, { minimumFractionDigits: 0, maximumFractionDigits: 1 })} — ${formatMoney(data.ndflAmount)}, прочие (Other_withholdings) — ${formatMoney(data.otherWithholdings)}, всего (Total_withhold) — ${formatMoney(data.totalWithhold)}<br>
-        <strong>Итоги:</strong> начислено (Gross_salary) — ${formatMoney(data.grossSalary)}, на руки (Net_salary) — ${formatMoney(data.netSalary)}<br>
-        Доля разовых замен в начислениях (Share_subst_percent): <strong>${data.shareSubstPercent === null ? '—' : formatPercent(data.shareSubstPercent)}</strong><br>
-        Цена 1 часа доп. замены «на руки» (Subst_hour_net): <strong>${data.substHourNet === null ? '—' : formatMoney(data.substHourNet)}</strong>
+        <strong>Оклад логопеда:</strong> ${formatMoney(data.baseOklad)}<br>
+        <strong>Учебная нагрузка по договору:</strong> ${formatMoney(data.teacherContract)}<br>
+        <strong>Учебная нагрузка по формуле:</strong> ${formatMoney(data.teacherCalc)}<br>
+        <strong>Разница по нагрузке:</strong> ${formatSignedMoney(data.teacherDelta)}<br>
+        <strong>Дополнительные замены:</strong> ${formatMoney(data.extraSubstitution)}<br>
+        <strong>Компенсации:</strong> всего — ${formatMoney(data.compTotal)}, ОВЗ — ${formatMoney(data.compOvz)}, прочие — ${formatMoney(data.compOther)}<br>
+        <strong>Стимулирующие выплаты:</strong> ${formatMoney(data.stimTotal)}<br>
+        <strong>Налоги и удержания:</strong> НДФЛ ${formatPercent(data.ndflRate, { minimumFractionDigits: 0, maximumFractionDigits: 1 })} — ${formatMoney(data.ndflAmount)}, прочие — ${formatMoney(data.otherWithholdings)}, всего — ${formatMoney(data.totalWithhold)}<br>
+        <strong>Итоги:</strong> начислено — ${formatMoney(data.grossSalary)}, на руки — ${formatMoney(data.netSalary)}<br>
+        Доля разовых замен в начислениях: <strong>${data.shareSubstPercent === null ? '—' : formatPercent(data.shareSubstPercent)}</strong><br>
+        Цена 1 часа доп. замены «на руки»: <strong>${data.substHourNet === null ? '—' : formatMoney(data.substHourNet)}</strong>
       `;
     }
 
@@ -1705,7 +1705,7 @@
         `Компенсации: ${formatMoney(data.compTotal)} (ОВЗ — ${formatMoney(data.compOvz)}, прочие — ${formatMoney(data.compOther)})`,
         `Стимулирующие: ${formatMoney(data.stimTotal)}`,
         `Налоги: НДФЛ ${formatPercent(data.ndflRate, { minimumFractionDigits: 0, maximumFractionDigits: 1 })} — ${formatMoney(data.ndflAmount)}, прочие — ${formatMoney(data.otherWithholdings)}, всего — ${formatMoney(data.totalWithhold)}`,
-        `Итоги: Gross_salary — ${formatMoney(data.grossSalary)}, Net_salary — ${formatMoney(data.netSalary)}`,
+        `Итоги: начислено — ${formatMoney(data.grossSalary)}, на руки — ${formatMoney(data.netSalary)}`,
         `Доля разовых замен: ${shareText}`,
         `Цена часа доп. замены «на руки»: ${substNet}`,
       ].join('\n');
