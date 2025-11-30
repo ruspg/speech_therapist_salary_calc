@@ -55,17 +55,66 @@
       background: linear-gradient(135deg, var(--accent), #3aafa9);
       color: #fff;
       border: none;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
     }
 
-    .summary-main {
-      font-size: 24px;
-      font-weight: 700;
+    .summary-headline {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       margin-bottom: 8px;
+    }
+
+    .summary-title {
+      font-size: 16px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-weight: 700;
+      opacity: 0.9;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px;
+    }
+
+    .summary-chip {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-height: 72px;
+    }
+
+    .summary-chip.primary {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .summary-chip .label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      opacity: 0.85;
+      font-weight: 700;
+    }
+
+    .summary-chip .value {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.2;
     }
 
     .summary-details {
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.6;
       opacity: 0.9;
     }
 
@@ -171,6 +220,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .teacher-label {
@@ -304,6 +354,34 @@
       gap: 10px;
       flex-wrap: wrap;
     }
+
+    @media (max-width: 420px) {
+      body {
+        padding: 12px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      h2 {
+        font-size: 16px;
+      }
+
+      section {
+        padding: 14px;
+      }
+
+      .summary {
+        margin-left: -4px;
+        margin-right: -4px;
+        border-radius: 0 0 12px 12px;
+      }
+
+      .summary-chip .value {
+        font-size: 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -314,7 +392,19 @@
     </header>
 
     <section class="summary" aria-live="polite">
-      <div class="summary-main" id="total_display">Итоговая сумма за месяц: 0 ₽</div>
+      <div class="summary-headline">
+        <div class="summary-title">Итоги за месяц</div>
+        <div class="summary-grid">
+          <div class="summary-chip primary">
+            <div class="label">На руки</div>
+            <div class="value" id="net_display">0 ₽</div>
+          </div>
+          <div class="summary-chip">
+            <div class="label">Брутто</div>
+            <div class="value" id="gross_display">0 ₽</div>
+          </div>
+        </div>
+      </div>
       <div class="summary-details" id="summary_breakdown"></div>
     </section>
 
@@ -708,7 +798,8 @@
       other_withholdings: document.getElementById('other_withholdings'),
     };
 
-    const summaryDisplay = document.getElementById('total_display');
+    const netDisplay = document.getElementById('net_display');
+    const grossDisplay = document.getElementById('gross_display');
     const summaryBreakdown = document.getElementById('summary_breakdown');
     const totalsBreakdown = document.getElementById('totals_breakdown');
     const logopedBreakdown = document.getElementById('logoped_breakdown');
@@ -1008,7 +1099,8 @@
 
       const teacherDelta = teacherCalc.total - oTeacherContract;
 
-      summaryDisplay.textContent = `На руки (Net_salary): ${formatMoney(netSalary)} • Брутто (Gross_salary): ${formatMoney(grossSalary)}`;
+      netDisplay.textContent = formatMoney(netSalary);
+      grossDisplay.textContent = formatMoney(grossSalary);
       const summaryText = `
         <strong>Оклад логопеда:</strong> ${formatMoney(zLogoped)}<br>
         <strong>Учебная нагрузка:</strong> договор — ${formatMoney(oTeacherContract)}, формула — ${formatMoney(teacherCalc.total)}, Δ — ${formatSignedMoney(teacherDelta)}<br>
@@ -1168,7 +1260,7 @@
       });
 
       copyBtn.addEventListener('click', async () => {
-        const text = `Итоговая сумма: ${summaryDisplay.textContent.replace('Итоговая сумма за месяц: ', '')}\n` +
+        const text = `На руки: ${netDisplay.textContent}; Брутто: ${grossDisplay.textContent}\n` +
           summaryBreakdown.innerText.replace(/\s+/g, ' ').trim();
         try {
           await navigator.clipboard.writeText(text);
