@@ -267,7 +267,7 @@
 
 ```text
 Base_logoped = O_logoped_base × S_log
-````
+```
 
 ---
 
@@ -282,9 +282,7 @@ K_total = (K1 + K2 + … + Km) − (m − 1)
 В текущем калькуляторе v5 фактически используем **два коэффициента**:
 
 - `K_div` — коэффициент деления / малокомплектности;
-    
 - `K_subj` — предметный коэффициент.
-    
 
 Поэтому:
 
@@ -305,15 +303,10 @@ O_line = C_stu × t_week × Weeks_year / Months_year × K_total
 Где:
 
 - `C_stu` — стоимость ученико-часа;
-    
 - `t_week` — часов в неделю по предмету;
-    
 - `Weeks_year` — учебных недель;
-    
 - `Months_year` — месяцев в году;
-    
 - `K_total` — суммарный коэффициент (см. 5.2).
-    
 
 Суммарный оклад по учебной нагрузке по формуле:
 
@@ -335,11 +328,8 @@ Delta_teacher = O_teacher_calc − O_teacher_contract
 В интерфейсе:
 
 - «По договору: … ₽»;
-    
 - «По формуле: … ₽»;
-    
 - «Разница: … ₽ (в плюс/минус)».
-    
 
 ---
 
@@ -369,7 +359,6 @@ R_sub_current = 0
 Если блок включён (`use_extra_subst = true`) и `H_sub_extra > 0`, ставка рассчитывается в зависимости от режима:
 
 1. **Режим «по приказу школы»**
-    
 
 ```text
 Если Subst_rate_mode = "по приказу школы":
@@ -377,7 +366,6 @@ R_sub_current = 0
 ```
 
 2. **Режим «по ученико-часу (упрощённо)**
-    
 
 ```text
 Если Subst_rate_mode = "по ученико-часу":
@@ -396,9 +384,7 @@ Subst_extra = H_sub_extra × R_sub_current
 Важно:
 
 - 12 часов основной учебной нагрузки уже учтены в `O_teacher_contract`/`O_teacher_calc` и сюда **не попадают**;
-    
 - режим «по ученико-часу» реализует упрощённую нормативную методику Положения: для коррекционных/малокомплектных классов считается, что коэффициент малокомплектности доводит численность до 25 человек.
-    
 
 ---
 
@@ -446,16 +432,14 @@ Gross_salary = Base_logoped + O_teacher_contract + Comp_total + Subst_extra + St
 ### 5.10. Удержания
 
 - НДФЛ:
-    
 
 ```text
 Ndfl_amount = Gross_salary × Ndfl_rate / 100
 ```
 
 - Прочие удержания: `Withhold_other` (из ввода пользователя).
-    
+
 - Всего удержаний:
-    
 
 ```text
 Total_withhold = Ndfl_amount + Withhold_other
@@ -476,7 +460,6 @@ Net_salary = Gross_salary − Total_withhold
 Дополнительные показатели:
 
 1. **Доля разовых замен в общей зарплате**
-    
 
 ```text
 Share_subst_percent =
@@ -487,7 +470,6 @@ Share_subst_percent =
 ```
 
 2. **Цена одного часа разовой замены «на руки»**
-    
 
 ```text
 Subst_hour_net =
@@ -519,7 +501,6 @@ Subst_hour_net =
 - `Subst_rate_mode`, `R_sub_extra`, `N_class_subst`, `Class_type_subst`;
 - `K_OVZ`, `OVZ_base_mode`;
 - `Stim_month`.
-    
 
 ---
 
