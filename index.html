@@ -474,9 +474,25 @@
         <input id="use_stim" type="checkbox" checked>
         <label for="use_stim" style="margin:0">Учитывать стимулирующие выплаты</label>
       </div>
-      <div class="field">
-        <label for="stim_sum">Суммарные стимулирующие выплаты в месяц, ₽</label>
-        <input id="stim_sum" type="number" min="0" step="100">
+      <div id="stim_block">
+        <div class="sub-grid">
+          <div class="field" style="margin-bottom:0">
+            <label for="stim_part1">Стимулирующая часть 1, ₽</label>
+            <input id="stim_part1" type="number" min="0" step="100">
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label for="stim_part2">Стимулирующая часть 2, ₽</label>
+            <input id="stim_part2" type="number" min="0" step="100">
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label for="stim_part3">Стимулирующая часть 3, ₽</label>
+            <input id="stim_part3" type="number" min="0" step="100">
+          </div>
+        </div>
+        <div class="field" style="margin-top:10px">
+          <label for="stim_total">Stim_total, ₽</label>
+          <input id="stim_total" type="number" readonly>
+        </div>
       </div>
     </section>
 
@@ -538,7 +554,9 @@
       k_ovz: 20,
       comp_other: 0,
       use_stim: true,
-      stim_sum: 0,
+      stim_part1: 3000,
+      stim_part2: 0,
+      stim_part3: 0,
     };
 
     const inputs = {
@@ -571,7 +589,9 @@
       k_ovz: document.getElementById('k_ovz'),
       comp_other: document.getElementById('comp_other'),
       use_stim: document.getElementById('use_stim'),
-      stim_sum: document.getElementById('stim_sum'),
+      stim_part1: document.getElementById('stim_part1'),
+      stim_part2: document.getElementById('stim_part2'),
+      stim_part3: document.getElementById('stim_part3'),
     };
 
     const summaryDisplay = document.getElementById('total_display');
@@ -592,6 +612,8 @@
     const copyBtn = document.getElementById('copy_btn');
     const mrotWarning = document.getElementById('mrot_warning');
     const teacherWarning = document.getElementById('teacher_warning');
+    const stimBlock = document.getElementById('stim_block');
+    const stimTotalField = document.getElementById('stim_total');
     const MROT = 19372;
     const CORRECTION_CLASS_COEF = 1.3;
 
@@ -766,7 +788,10 @@
       });
 
       const stimEnabled = inputs.use_stim.checked;
-      inputs.stim_sum.disabled = !stimEnabled;
+      stimBlock.classList.toggle('hidden', !stimEnabled);
+      [...stimBlock.querySelectorAll('input')].forEach((el) => {
+        el.disabled = !stimEnabled;
+      });
     }
 
     function recalc() {
@@ -823,7 +848,11 @@
       const zComp = compTotal;
 
       const useStim = inputs.use_stim.checked;
-      const zStim = useStim ? parseNumber(inputs.stim_sum) : 0;
+      const stimPart1 = useStim ? parseNumber(inputs.stim_part1) : 0;
+      const stimPart2 = useStim ? parseNumber(inputs.stim_part2) : 0;
+      const stimPart3 = useStim ? parseNumber(inputs.stim_part3) : 0;
+      const zStim = useStim ? stimPart1 + stimPart2 + stimPart3 : 0;
+      stimTotalField.value = zStim.toFixed(2);
 
       const total = zLogoped + oTeacherContract + zSubst + zSubstExtra + zComp + zStim;
 
