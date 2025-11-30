@@ -826,6 +826,8 @@
   </div>
 
   <script>
+    // Salary calculator for speech therapist / teacher at School XXXX.
+    // Calculates base salary, teaching load, extra substitutions, compensations, bonuses, and taxes.
     function mergeDescribedBy(control, id) {
       if (!control || !id) return;
       const existing = (control.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
@@ -1031,10 +1033,12 @@
     let lastSummarySnapshot = null;
     let lastRSubCurrent = 0;
 
+    // Format numeric values with locale-aware separators.
     function formatNumber(value, { minimumFractionDigits = 0, maximumFractionDigits = minimumFractionDigits } = {}) {
       return Number(value).toLocaleString('ru-RU', { minimumFractionDigits, maximumFractionDigits });
     }
 
+    // Format currency values in rubles with two decimal places.
     function formatMoney(value) {
       return `${formatNumber(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`;
     }
@@ -1132,6 +1136,7 @@
       return value;
     }
 
+    // Read and validate numeric input by id using preset validation rules.
     function getValue(id) {
       return validateNumber(inputs[id], validationRules[id]);
     }
@@ -1328,13 +1333,17 @@
       });
     }
 
+    // Recalculate all salary components and update the UI with current values.
     function recalc() {
+      // 1. Read global parameters (student-hour rate, weeks, months)
       const tLogoped = getValue('t_logoped');
       const share = getValue('logoped_share');
 
+      // 2. Base salary as speech therapist
       const baseOklad = tLogoped * share;
       const zLogoped = baseOklad;
 
+      // 3. Teaching load as a teacher (formula 3.9)
       const cStu = getValue('c_stu');
       const weeksYear = getValue('weeks_year');
       const monthsYear = getValue('months_year');
@@ -1349,6 +1358,7 @@
 
       const teacherCalc = useTeacher ? calculateTeacherLoad(cStu, weeksYear, monthsYear, a1, a2, a3) : { total: 0, lines: [] };
 
+      // 4. Extra substitutions
       const useExtraSubst = inputs.use_extra_subst.checked;
       const uValue = useExtraSubst ? getValue('u_value') : 0;
 
@@ -1378,6 +1388,7 @@
       }
       substitutionWarning.textContent = substitutionIssues.join(' ');
 
+      // 5. Compensations
       const useComp = inputs.use_compensations.checked;
       const ovzBaseMode = Array.from(ovzBaseRadios).find((radio) => radio.checked)?.value || defaults.inputs.ovz_base_mode;
       const kOvz = useComp ? getValue('k_ovz') : 0;
@@ -1387,6 +1398,7 @@
       const compTotal = useComp ? compOvz + compOther : 0;
       const zComp = compTotal;
 
+      // 6. Incentive payments
       const useStim = inputs.use_stim.checked;
       const stimPart1 = useStim ? getValue('stim_part1') : 0;
       const stimPart2 = useStim ? getValue('stim_part2') : 0;
@@ -1394,6 +1406,7 @@
       const zStim = useStim ? stimPart1 + stimPart2 + stimPart3 : 0;
       stimTotalField.value = zStim.toFixed(2);
 
+      // 7. Gross, taxes, net, shares
       const grossTotal = zLogoped + oTeacherContract + zSubstExtra + zComp + zStim;
       const grossSalary = grossTotal;
 
@@ -1526,6 +1539,7 @@
       }
     }
 
+    // Compute teacher load totals and breakdown by subject line using formula 3.9.
     function calculateTeacherLoad(cStu, weeksYear, monthsYear, a1, a2, a3) {
       const pupilFactor = a1 + 2 * a2 + 3 * a3;
 
