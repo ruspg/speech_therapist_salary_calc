@@ -248,11 +248,14 @@
       background: var(--accent-soft);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 6px 8px;
+      padding: 6px 10px;
       font-weight: 700;
       font-size: 12px;
       color: var(--text);
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     label {
@@ -382,6 +385,16 @@
 
     #teacher_block.hidden {
       display: block;
+    }
+
+    @media (max-width: 768px) {
+      .field {
+        margin-bottom: 16px;
+      }
+
+      .input-with-unit {
+        gap: 10px;
+      }
     }
 
     .sub-grid {
@@ -770,14 +783,14 @@
           <span class="toggle-text">Учитывать учебную нагрузку</span>
         </label>
       </div>
-      <div id="teacher_block" class="toggle-section">
-        <div class="field">
-          <label for="o_teacher_contract">Оклад за учебную нагрузку по договору, ₽</label>
-          <div class="input-with-unit">
-            <input id="o_teacher_contract" type="number" min="0" step="0.01">
-            <span class="unit-badge">₽/мес</span>
+        <div id="teacher_block" class="toggle-section">
+          <div class="field">
+            <label for="o_teacher_contract">Оклад за учебную нагрузку по договору</label>
+            <div class="input-with-unit">
+              <input id="o_teacher_contract" type="number" min="0" step="0.01">
+              <span class="unit-badge">₽/мес</span>
+            </div>
           </div>
-        </div>
         <div class="field">
           <label>Состав класса (количество обучающихся) <span class="info" tabindex="0" data-tooltip="Сколько учеников в группах разных уровней: A1 слабый, A2 средний, A3 сильный. (class composition)">?</span></label>
           <div class="sub-grid">
@@ -877,7 +890,7 @@
           </div>
         </div>
         <div class="field">
-          <label for="r_sub_extra">Ставка по приказу (R_sub_extra), ₽</label>
+          <label for="r_sub_extra">Ставка по приказу (R_sub_extra)</label>
           <div class="input-with-unit">
             <input id="r_sub_extra" type="number" min="0" step="1">
             <span class="unit-badge">₽/урок</span>
@@ -923,21 +936,21 @@
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
-          <label for="comp_other">Прочие компенсации (Comp_other), ₽</label>
+          <label for="comp_other">Прочие компенсации (Comp_other)</label>
           <div class="input-with-unit">
             <input id="comp_other" type="number" min="0" step="1">
             <span class="unit-badge">₽/мес</span>
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
-          <label for="comp_ovz">Компенсация за ОВЗ (Comp_OVZ), ₽</label>
+          <label for="comp_ovz">Компенсация за ОВЗ (Comp_OVZ)</label>
           <div class="input-with-unit">
             <input id="comp_ovz" type="number" readonly>
             <span class="unit-badge">₽/мес</span>
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
-          <label for="comp_total">Итоговые компенсации (Comp_total), ₽</label>
+          <label for="comp_total">Итоговые компенсации (Comp_total)</label>
           <div class="input-with-unit">
             <input id="comp_total" type="number" readonly>
             <span class="unit-badge">₽/мес</span>
@@ -963,14 +976,14 @@
             </div>
           </div>
           <div class="field" style="margin-bottom:0">
-            <label for="stim_part2">Стимулирующая часть 2, ₽</label>
+            <label for="stim_part2">Стимулирующая часть 2</label>
             <div class="input-with-unit">
               <input id="stim_part2" type="number" min="0" step="1">
               <span class="unit-badge">₽/мес</span>
             </div>
           </div>
           <div class="field" style="margin-bottom:0">
-            <label for="stim_part3">Стимулирующая часть 3, ₽</label>
+            <label for="stim_part3">Стимулирующая часть 3</label>
             <div class="input-with-unit">
               <input id="stim_part3" type="number" min="0" step="1">
               <span class="unit-badge">₽/мес</span>
@@ -978,7 +991,7 @@
           </div>
         </div>
         <div class="field" style="margin-top:10px">
-          <label for="stim_total">Stim_total, ₽</label>
+          <label for="stim_total">Stim_total</label>
           <div class="input-with-unit">
             <input id="stim_total" type="number" readonly>
             <span class="unit-badge">₽/мес</span>
@@ -991,28 +1004,28 @@
       <h2>Налоги и удержания</h2>
       <div class="sub-grid">
         <div class="field" style="margin-bottom:0">
-          <label for="ndfl_rate">Ставка НДФЛ, %</label>
+          <label for="ndfl_rate">Ставка НДФЛ (Ndfl_rate)</label>
           <div class="input-with-unit">
             <input id="ndfl_rate" type="number" min="0" max="100" step="0.1">
             <span class="unit-badge">%</span>
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
-          <label for="other_withholdings">Прочие удержания, ₽</label>
+          <label for="other_withholdings">Прочие удержания (Other_withholdings)</label>
           <div class="input-with-unit">
             <input id="other_withholdings" type="number" min="0" step="1">
             <span class="unit-badge">₽/мес</span>
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
-          <label for="ndfl_amount">Ndfl_amount, ₽</label>
+          <label for="ndfl_amount">Ndfl_amount</label>
           <div class="input-with-unit">
             <input id="ndfl_amount" type="number" readonly>
             <span class="unit-badge">₽</span>
           </div>
         </div>
         <div class="field" style="margin-bottom:0">
-          <label for="total_withhold">Total_withhold, ₽</label>
+          <label for="total_withhold">Total_withhold</label>
           <div class="input-with-unit">
             <input id="total_withhold" type="number" readonly>
             <span class="unit-badge">₽</span>
