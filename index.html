@@ -612,7 +612,7 @@
       <div class="field">
         <label for="t_logoped">Оклад логопеда за 1 ставку (O_logoped_base) <span class="info" tabindex="0" data-tooltip="Размер оклада логопеда за полную ставку из трудового договора, до удержаний НДФЛ. (base salary)">?</span></label>
         <div class="input-with-unit">
-          <input id="t_logoped" type="number" min="0" step="100">
+          <input id="t_logoped" type="number" min="0" step="1">
           <span class="unit-badge">₽/мес</span>
         </div>
       </div>
@@ -785,7 +785,7 @@
         <div class="field" style="margin-bottom:0">
           <label for="comp_other">Прочие компенсации (Comp_other), ₽</label>
           <div class="input-with-unit">
-            <input id="comp_other" type="number" min="0" step="100">
+            <input id="comp_other" type="number" min="0" step="1">
             <span class="unit-badge">₽/мес</span>
           </div>
         </div>
@@ -818,21 +818,21 @@
           <div class="field" style="margin-bottom:0">
             <label for="stim_part1">Стабильная стимулирующая (Stim_month) <span class="info" tabindex="0" data-tooltip="Ежемесячная фиксированная стимулирующая выплата, включая стабильную часть. (stable bonus)">?</span></label>
             <div class="input-with-unit">
-              <input id="stim_part1" type="number" min="0" step="100">
+              <input id="stim_part1" type="number" min="0" step="1">
               <span class="unit-badge">₽/мес</span>
             </div>
           </div>
           <div class="field" style="margin-bottom:0">
             <label for="stim_part2">Стимулирующая часть 2, ₽</label>
             <div class="input-with-unit">
-              <input id="stim_part2" type="number" min="0" step="100">
+              <input id="stim_part2" type="number" min="0" step="1">
               <span class="unit-badge">₽/мес</span>
             </div>
           </div>
           <div class="field" style="margin-bottom:0">
             <label for="stim_part3">Стимулирующая часть 3, ₽</label>
             <div class="input-with-unit">
-              <input id="stim_part3" type="number" min="0" step="100">
+              <input id="stim_part3" type="number" min="0" step="1">
               <span class="unit-badge">₽/мес</span>
             </div>
           </div>
@@ -860,7 +860,7 @@
         <div class="field" style="margin-bottom:0">
           <label for="other_withholdings">Прочие удержания, ₽</label>
           <div class="input-with-unit">
-            <input id="other_withholdings" type="number" min="0" step="100">
+            <input id="other_withholdings" type="number" min="0" step="1">
             <span class="unit-badge">₽/мес</span>
           </div>
         </div>
@@ -1121,7 +1121,7 @@
       c_stu: { min: 0, max: 1000, step: 1, label: 'C_stu' },
       weeks_year: { min: 1, max: 52, step: 1, label: 'Weeks_year' },
       months_year: { min: 1, max: 12, step: 1, label: 'Months_year' },
-      t_logoped: { min: 0, max: 500000, step: 100, label: 'Оклад логопеда' },
+      t_logoped: { min: 0, max: 500000, step: 1, label: 'Оклад логопеда' },
       logoped_share: { min: 0, max: 1, step: 0.25, label: 'Доля ставки' },
       o_teacher_contract: { min: 0, max: 500000, step: 0.01, label: 'O_teacher_contract' },
       a1: { min: 0, max: 40, step: 1, label: 'A1' },
@@ -1129,15 +1129,15 @@
       a3: { min: 0, max: 40, step: 1, label: 'A3' },
       u_value: { min: 0, max: 1000, step: 1, label: 'U' },
       h_sub_extra: { min: 0, max: 200, step: 1, label: 'H_sub_extra' },
-      r_sub_extra: { min: 0, max: 20000, step: 50, label: 'R_sub_extra' },
+      r_sub_extra: { min: 0, max: 20000, step: 1, label: 'R_sub_extra' },
       n_class_subst: { min: 0, max: 35, step: 1, label: 'N_class_subst' },
       k_ovz: { min: 0, max: 100, step: 1, label: 'K_OVZ' },
-      comp_other: { min: 0, max: 500000, step: 100, label: 'Comp_other' },
-      stim_part1: { min: 0, max: 300000, step: 100, label: 'Stim_part1' },
-      stim_part2: { min: 0, max: 300000, step: 100, label: 'Stim_part2' },
-      stim_part3: { min: 0, max: 300000, step: 100, label: 'Stim_part3' },
+      comp_other: { min: 0, max: 500000, step: 1, label: 'Comp_other' },
+      stim_part1: { min: 0, max: 300000, step: 1, label: 'Stim_part1' },
+      stim_part2: { min: 0, max: 300000, step: 1, label: 'Stim_part2' },
+      stim_part3: { min: 0, max: 300000, step: 1, label: 'Stim_part3' },
       ndfl_rate: { min: 0, max: 100, step: 0.1, label: 'Ставка НДФЛ' },
-      other_withholdings: { min: 0, max: 500000, step: 100, label: 'Прочие удержания' },
+      other_withholdings: { min: 0, max: 500000, step: 1, label: 'Прочие удержания' },
     };
 
     const teacherLineRules = {
