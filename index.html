@@ -962,6 +962,8 @@
       ],
     };
 
+    const inputMessages = {};
+
     const inputs = {
       period: document.getElementById('period'),
       organization: document.getElementById('organization'),
@@ -1074,8 +1076,6 @@
       k_div: { min: 1, max: 10, step: 0.1, label: 'K_div' },
       k_subj: { min: 1, max: 5, step: 0.1, label: 'K_subj' },
     };
-
-    const inputMessages = {};
 
     const substRateRadios = document.querySelectorAll('input[name="subst_rate_mode"]');
     const ovzBaseRadios = document.querySelectorAll('input[name="ovz_base_mode"]');
