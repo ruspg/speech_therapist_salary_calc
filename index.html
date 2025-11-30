@@ -560,7 +560,7 @@
         kDivLabel.textContent = 'K_div';
         const kDivInput = document.createElement('input');
         kDivInput.type = 'number';
-        kDivInput.min = '0';
+        kDivInput.min = '1';
         kDivInput.step = '0.05';
         kDivInput.value = line.k_div;
         kDivInput.addEventListener('input', (e) => {
@@ -575,7 +575,7 @@
         kSubjLabel.textContent = 'K_subj';
         const kSubjInput = document.createElement('input');
         kSubjInput.type = 'number';
-        kSubjInput.min = '0';
+        kSubjInput.min = '1';
         kSubjInput.step = '0.05';
         kSubjInput.value = line.k_subj;
         kSubjInput.addEventListener('input', (e) => {
@@ -725,8 +725,8 @@
 
       teacherLines.forEach((line, index) => {
         const tWeek = Math.max(0, Number(line.t_week) || 0);
-        const kDiv = Math.max(0, Number(line.k_div) || 0);
-        const kSubj = Math.max(0, Number(line.k_subj) || 0);
+        const kDiv = Math.max(1, Number(line.k_div) || 0);
+        const kSubj = Math.max(1, Number(line.k_subj) || 0);
         const kTotal = Math.max(0, kDiv + kSubj - 1);
         const oLine = cStu * tWeek * weeksYear / monthsYear * kTotal;
         total += oLine;
