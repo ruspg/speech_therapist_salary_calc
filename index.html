@@ -125,6 +125,24 @@
       margin-bottom: 12px;
     }
 
+    .input-with-unit {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .unit-badge {
+      background: var(--accent-soft);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
     label {
       font-size: 14px;
       font-weight: 600;
@@ -428,33 +446,48 @@
       </div>
       <div class="field">
         <label for="c_stu">Стоимость 1 ученико-часа (C_stu) <span class="info" tabindex="0" data-tooltip="Нормативная стоимость одного ученико-часа по приказу/Положению об оплате труда.">?</span></label>
-        <input id="c_stu" type="number" min="0" step="1">
+        <div class="input-with-unit">
+          <input id="c_stu" type="number" min="0" step="1">
+          <span class="unit-badge">₽/ученико-час</span>
+        </div>
       </div>
       <div class="field">
         <label for="weeks_year">Количество учебных недель (Weeks_year)</label>
-        <input id="weeks_year" type="number" min="1" max="52" step="1">
+        <div class="input-with-unit">
+          <input id="weeks_year" type="number" min="1" max="52" step="1">
+          <span class="unit-badge">нед.</span>
+        </div>
       </div>
       <div class="field">
         <label for="months_year">Количество месяцев в году (Months_year)</label>
-        <input id="months_year" type="number" value="12" readonly>
+        <div class="input-with-unit">
+          <input id="months_year" type="number" value="12" readonly>
+          <span class="unit-badge">мес.</span>
+        </div>
       </div>
     </section>
 
     <section>
       <h2>Оклад логопеда</h2>
       <div class="field">
-        <label for="t_logoped">Оклад логопеда за 1 ставку, ₽/месяц</label>
-        <input id="t_logoped" type="number" min="0" step="100">
+        <label for="t_logoped">Оклад логопеда за 1 ставку (O_logoped_base) <span class="info" tabindex="0" data-tooltip="Должностной оклад за полную ставку по трудовому договору или тарификационному списку, до удержаний НДФЛ.">?</span></label>
+        <div class="input-with-unit">
+          <input id="t_logoped" type="number" min="0" step="100">
+          <span class="unit-badge">₽/мес</span>
+        </div>
       </div>
       <div class="field">
         <label for="logoped_share">Доля ставки логопеда</label>
-        <input id="logoped_share" type="number" min="0" max="1" step="0.25">
+        <div class="input-with-unit">
+          <input id="logoped_share" type="number" min="0" max="1" step="0.25">
+          <span class="unit-badge">ставки</span>
+        </div>
       </div>
       <div id="mrot_warning" class="warning-text" aria-live="polite"></div>
     </section>
 
     <section>
-      <h2>Учебная нагрузка как учитель</h2>
+      <h2>Учебная нагрузка как учитель <span class="info" tabindex="0" data-tooltip="Укажите оплачиваемую нагрузку по предметам: количество обучающихся, часы в неделю и коэффициенты для расчёта формулы 3.9.">?</span></h2>
       <div class="checkbox-row">
         <input id="use_teacher_load" type="checkbox" checked>
         <label for="use_teacher_load" style="margin:0">Учитывать учебную нагрузку</label>
@@ -462,22 +495,34 @@
       <div id="teacher_block">
         <div class="field">
           <label for="o_teacher_contract">Оклад за учебную нагрузку по договору, ₽</label>
-          <input id="o_teacher_contract" type="number" min="0" step="0.01">
+          <div class="input-with-unit">
+            <input id="o_teacher_contract" type="number" min="0" step="0.01">
+            <span class="unit-badge">₽/мес</span>
+          </div>
         </div>
         <div class="field">
           <label>Состав класса (количество обучающихся) <span class="info" tabindex="0" data-tooltip="Укажите численность по трем групповым уровням. Подсказка: для кейса «6-р» оставьте значения 4, 0 и 0.">?</span></label>
           <div class="sub-grid">
             <div class="field" style="margin-bottom:0">
               <label for="a1">A1</label>
-              <input id="a1" type="number" min="0" step="1">
+              <div class="input-with-unit">
+                <input id="a1" type="number" min="0" step="1">
+                <span class="unit-badge">учеников</span>
+              </div>
             </div>
             <div class="field" style="margin-bottom:0">
               <label for="a2">A2</label>
-              <input id="a2" type="number" min="0" step="1">
+              <div class="input-with-unit">
+                <input id="a2" type="number" min="0" step="1">
+                <span class="unit-badge">учеников</span>
+              </div>
             </div>
             <div class="field" style="margin-bottom:0">
               <label for="a3">A3</label>
-              <input id="a3" type="number" min="0" step="1">
+              <div class="input-with-unit">
+                <input id="a3" type="number" min="0" step="1">
+                <span class="unit-badge">учеников</span>
+              </div>
             </div>
           </div>
           <div id="teacher_warning" class="warning-text" aria-live="polite"></div>
@@ -520,7 +565,7 @@
     </section>
 
     <section>
-      <h2>Разовые замены</h2>
+      <h2>Разовые замены <span class="info" tabindex="0" data-tooltip="Укажите часы замещений, численность класса и коэффициенты из приказов на замещение или локальных актов.">?</span></h2>
       <div class="checkbox-row">
         <input id="use_substitution" type="checkbox" checked>
         <label for="use_substitution" style="margin:0">Учитывать замещающие уроки</label>
@@ -528,27 +573,45 @@
       <div class="sub-grid" id="substitution_block">
         <div class="field">
           <label for="h_subst">Часы замещения в месяц</label>
-          <input id="h_subst" type="number" min="0" step="1">
+          <div class="input-with-unit">
+            <input id="h_subst" type="number" min="0" step="1">
+            <span class="unit-badge">ч/мес</span>
+          </div>
         </div>
         <div class="field">
           <label for="n_students">Количество учеников в классе/группе</label>
-          <input id="n_students" type="number" min="1" max="25" step="1">
+          <div class="input-with-unit">
+            <input id="n_students" type="number" min="1" max="25" step="1">
+            <span class="unit-badge">учеников</span>
+          </div>
         </div>
         <div class="field">
           <label for="k_corr">K_corr: коэффициент за работу с детьми с умственной отсталостью <span class="info" tabindex="0" data-tooltip="Повышающий коэффициент за коррекционность. Обычно 1.2–1.4.">?</span></label>
-          <input id="k_corr" type="number" min="0" step="0.05">
+          <div class="input-with-unit">
+            <input id="k_corr" type="number" min="0" step="0.05">
+            <span class="unit-badge">коэфф.</span>
+          </div>
         </div>
         <div class="field">
           <label for="k_subst">K_subst: коэффициент за замещение отсутствующего учителя <span class="info" tabindex="0" data-tooltip="Оплата за фактическое замещение. Обычно 1.05–1.2.">?</span></label>
-          <input id="k_subst" type="number" min="0" step="0.05">
+          <div class="input-with-unit">
+            <input id="k_subst" type="number" min="0" step="0.05">
+            <span class="unit-badge">коэфф.</span>
+          </div>
         </div>
         <div class="field">
           <label for="k_usl_subst">Коэффициент условий труда (замещение) <span class="info" tabindex="0" data-tooltip="Особые условия при замещении. Обычно 1.0–1.2.">?</span></label>
-          <input id="k_usl_subst" type="number" min="0" step="0.05">
+          <div class="input-with-unit">
+            <input id="k_usl_subst" type="number" min="0" step="0.05">
+            <span class="unit-badge">коэфф.</span>
+          </div>
         </div>
         <div class="field">
           <label for="u_value">Стоимость ученика-часа, ₽</label>
-          <input id="u_value" type="number" min="0" step="1">
+          <div class="input-with-unit">
+            <input id="u_value" type="number" min="0" step="1">
+            <span class="unit-badge">₽/ученико-час</span>
+          </div>
         </div>
       </div>
       <div class="checkbox-row" style="margin-top:4px">
@@ -558,7 +621,10 @@
       <div class="sub-grid" id="extra_subst_block">
         <div class="field">
           <label for="h_sub_extra">Дополнительные часы (H_sub_extra)</label>
-          <input id="h_sub_extra" type="number" min="0" step="1">
+          <div class="input-with-unit">
+            <input id="h_sub_extra" type="number" min="0" step="1">
+            <span class="unit-badge">ч/мес</span>
+          </div>
         </div>
         <div class="field">
           <label>Режим ставки (Subst_rate_mode)</label>
@@ -569,11 +635,17 @@
         </div>
         <div class="field">
           <label for="r_sub_extra">Ставка по приказу (R_sub_extra), ₽</label>
-          <input id="r_sub_extra" type="number" min="0" step="1">
+          <div class="input-with-unit">
+            <input id="r_sub_extra" type="number" min="0" step="1">
+            <span class="unit-badge">₽/урок</span>
+          </div>
         </div>
         <div class="field">
           <label for="n_class_subst">Численность класса для расчёта</label>
-          <input id="n_class_subst" type="number" min="0" step="1">
+          <div class="input-with-unit">
+            <input id="n_class_subst" type="number" min="0" step="1">
+            <span class="unit-badge">учеников</span>
+          </div>
         </div>
         <div class="field">
           <label for="class_type_subst">Тип класса (Class_type_subst)</label>
@@ -592,7 +664,7 @@
         <label for="use_compensations" style="margin:0">Учитывать компенсационные выплаты</label>
       </div>
       <div class="field">
-        <label>OVZ_base_mode: база для расчёта компенсации</label>
+        <label>OVZ_base_mode: база для расчёта компенсации <span class="info" tabindex="0" data-tooltip="Выберите, от какого оклада считать процент за работу с ОВЗ: только логопедический или логопедический вместе с учительским.">?</span></label>
         <div class="flex-row" role="radiogroup" aria-label="OVZ_base_mode">
           <label><input type="radio" name="ovz_base_mode" value="logoped"> Логопедический</label>
           <label><input type="radio" name="ovz_base_mode" value="combined"> Логопедический + учительский</label>
@@ -600,20 +672,32 @@
       </div>
       <div class="sub-grid">
         <div class="field" style="margin-bottom:0">
-          <label for="k_ovz">% K_OVZ (0–20)</label>
-          <input id="k_ovz" type="number" min="0" max="20" step="0.1">
+          <label for="k_ovz">% K_OVZ (0–20) <span class="info" tabindex="0" data-tooltip="Процентная доплата за работу с обучающимися с ОВЗ в соответствии с положением об оплате труда.">?</span></label>
+          <div class="input-with-unit">
+            <input id="k_ovz" type="number" min="0" max="20" step="0.1">
+            <span class="unit-badge">%</span>
+          </div>
         </div>
         <div class="field" style="margin-bottom:0">
           <label for="comp_other">Прочие компенсации (Comp_other), ₽</label>
-          <input id="comp_other" type="number" min="0" step="100">
+          <div class="input-with-unit">
+            <input id="comp_other" type="number" min="0" step="100">
+            <span class="unit-badge">₽/мес</span>
+          </div>
         </div>
         <div class="field" style="margin-bottom:0">
           <label for="comp_ovz">Компенсация за ОВЗ (Comp_OVZ), ₽</label>
-          <input id="comp_ovz" type="number" readonly>
+          <div class="input-with-unit">
+            <input id="comp_ovz" type="number" readonly>
+            <span class="unit-badge">₽/мес</span>
+          </div>
         </div>
         <div class="field" style="margin-bottom:0">
           <label for="comp_total">Итоговые компенсации (Comp_total), ₽</label>
-          <input id="comp_total" type="number" readonly>
+          <div class="input-with-unit">
+            <input id="comp_total" type="number" readonly>
+            <span class="unit-badge">₽/мес</span>
+          </div>
         </div>
       </div>
     </section>
@@ -627,21 +711,33 @@
       <div id="stim_block">
         <div class="sub-grid">
           <div class="field" style="margin-bottom:0">
-            <label for="stim_part1">Стимулирующая часть 1, ₽</label>
-            <input id="stim_part1" type="number" min="0" step="100">
+            <label for="stim_part1">Стабильная стимулирующая (Stim_month) <span class="info" tabindex="0" data-tooltip="Ежемесячная фиксированная стимулирующая выплата (в т.ч. стабильная выплата 2025/2026).">?</span></label>
+            <div class="input-with-unit">
+              <input id="stim_part1" type="number" min="0" step="100">
+              <span class="unit-badge">₽/мес</span>
+            </div>
           </div>
           <div class="field" style="margin-bottom:0">
             <label for="stim_part2">Стимулирующая часть 2, ₽</label>
-            <input id="stim_part2" type="number" min="0" step="100">
+            <div class="input-with-unit">
+              <input id="stim_part2" type="number" min="0" step="100">
+              <span class="unit-badge">₽/мес</span>
+            </div>
           </div>
           <div class="field" style="margin-bottom:0">
             <label for="stim_part3">Стимулирующая часть 3, ₽</label>
-            <input id="stim_part3" type="number" min="0" step="100">
+            <div class="input-with-unit">
+              <input id="stim_part3" type="number" min="0" step="100">
+              <span class="unit-badge">₽/мес</span>
+            </div>
           </div>
         </div>
         <div class="field" style="margin-top:10px">
           <label for="stim_total">Stim_total, ₽</label>
-          <input id="stim_total" type="number" readonly>
+          <div class="input-with-unit">
+            <input id="stim_total" type="number" readonly>
+            <span class="unit-badge">₽/мес</span>
+          </div>
         </div>
       </div>
     </section>
@@ -651,19 +747,31 @@
       <div class="sub-grid">
         <div class="field" style="margin-bottom:0">
           <label for="ndfl_rate">Ставка НДФЛ, %</label>
-          <input id="ndfl_rate" type="number" min="0" max="100" step="0.1">
+          <div class="input-with-unit">
+            <input id="ndfl_rate" type="number" min="0" max="100" step="0.1">
+            <span class="unit-badge">%</span>
+          </div>
         </div>
         <div class="field" style="margin-bottom:0">
           <label for="other_withholdings">Прочие удержания, ₽</label>
-          <input id="other_withholdings" type="number" min="0" step="100">
+          <div class="input-with-unit">
+            <input id="other_withholdings" type="number" min="0" step="100">
+            <span class="unit-badge">₽/мес</span>
+          </div>
         </div>
         <div class="field" style="margin-bottom:0">
           <label for="ndfl_amount">Ndfl_amount, ₽</label>
-          <input id="ndfl_amount" type="number" readonly>
+          <div class="input-with-unit">
+            <input id="ndfl_amount" type="number" readonly>
+            <span class="unit-badge">₽</span>
+          </div>
         </div>
         <div class="field" style="margin-bottom:0">
           <label for="total_withhold">Total_withhold, ₽</label>
-          <input id="total_withhold" type="number" readonly>
+          <div class="input-with-unit">
+            <input id="total_withhold" type="number" readonly>
+            <span class="unit-badge">₽</span>
+          </div>
         </div>
       </div>
     </section>
@@ -862,6 +970,20 @@
       return valid ? value : 0;
     }
 
+    function createUnitBadge(text) {
+      const badge = document.createElement('span');
+      badge.className = 'unit-badge';
+      badge.textContent = text;
+      return badge;
+    }
+
+    function wrapWithUnit(input, unitText) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'input-with-unit';
+      wrapper.append(input, createUnitBadge(unitText));
+      return wrapper;
+    }
+
     function setDefaults() {
       Object.entries(defaults).forEach(([key, value]) => {
         const field = inputs[key];
@@ -920,7 +1042,7 @@
           line.t_week = Number(e.target.value);
           recalc();
         });
-        hoursField.append(hoursLabel, hoursInput);
+        hoursField.append(hoursLabel, wrapWithUnit(hoursInput, 'ч/нед'));
 
         const kDivField = document.createElement('div');
         kDivField.className = 'field';
@@ -935,7 +1057,7 @@
           line.k_div = Number(e.target.value);
           recalc();
         });
-        kDivField.append(kDivLabel, kDivInput);
+        kDivField.append(kDivLabel, wrapWithUnit(kDivInput, 'коэфф.'));
 
         const kSubjField = document.createElement('div');
         kSubjField.className = 'field';
@@ -950,7 +1072,7 @@
           line.k_subj = Number(e.target.value);
           recalc();
         });
-        kSubjField.append(kSubjLabel, kSubjInput);
+        kSubjField.append(kSubjLabel, wrapWithUnit(kSubjInput, 'коэфф.'));
 
         const removeField = document.createElement('div');
         removeField.className = 'field';
