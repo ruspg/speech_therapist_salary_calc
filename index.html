@@ -114,11 +114,23 @@
       flex-direction: column;
       gap: 4px;
       min-height: 72px;
+      backdrop-filter: blur(2px);
     }
 
     .summary-chip.primary {
-      background: rgba(255, 255, 255, 0.18);
-      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.24);
+      border-color: rgba(255, 255, 255, 0.6);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    }
+
+    .summary-chip.primary .label {
+      opacity: 1;
+      letter-spacing: 0.04em;
+    }
+
+    .summary-chip.primary .value {
+      font-size: 24px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
     .summary-chip .label {
@@ -145,6 +157,81 @@
       padding: 12px 14px;
       margin-top: 10px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .summary-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .summary-section + .summary-section {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .summary-section-title {
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: #52606d;
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .summary-row .label {
+      font-weight: 600;
+      color: #1f2933;
+    }
+
+    .summary-money {
+      font-weight: 800;
+    }
+
+    .summary-subrow {
+      margin-left: 8px;
+      color: #52606d;
+      font-size: 13px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .summary-subrow .label {
+      font-weight: 700;
+      color: #1f2933;
+    }
+
+    .summary-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      background: #f0f4f8;
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .share-chip {
+      background: #e8f5f1;
+      border-color: #b5e0d3;
+      color: #0f9151;
+    }
+
+    .delta-positive.summary-tag,
+    .delta-negative.summary-tag {
+      border-color: transparent;
     }
 
     .field {
@@ -1541,7 +1628,7 @@
       ` : 'Дополнительное замещение не учитывается.';
 
       const substitutionStatsText = `
-        Share_subst_percent = ${shareSubstPercent === null ? '—' : `<strong>${formatPercent(shareSubstPercent)}</strong>`}<br>
+        Share_subst_percent = ${shareSubstPercent === null ? '—' : `<span class="summary-tag share-chip">${formatPercent(shareSubstPercent)}</span>`}<br>
         Subst_hour_net = ${substHourNet === null ? '—' : `<strong>${formatMoney(substHourNet)}</strong>`}
       `;
 
@@ -1694,18 +1781,41 @@
     });
 
     function buildSummaryHtml(data) {
+      const deltaClass = data.teacherDelta > 0 ? 'delta-positive' : data.teacherDelta < 0 ? 'delta-negative' : '';
+      const shareChip = data.shareSubstPercent === null
+        ? '—'
+        : `<span class="summary-tag share-chip">${formatPercent(data.shareSubstPercent)}</span>`;
+
       return `
-        <strong>Оклад логопеда:</strong> ${formatMoney(data.baseOklad)}<br>
-        <strong>Учебная нагрузка по договору:</strong> ${formatMoney(data.teacherContract)}<br>
-        <strong>Учебная нагрузка по формуле:</strong> ${formatMoney(data.teacherCalc)}<br>
-        <strong>Разница по нагрузке:</strong> ${formatSignedMoney(data.teacherDelta)}<br>
-        <strong>Дополнительные замены:</strong> ${formatMoney(data.extraSubstitution)}<br>
-        <strong>Компенсации:</strong> всего — ${formatMoney(data.compTotal)}, ОВЗ — ${formatMoney(data.compOvz)}, прочие — ${formatMoney(data.compOther)}<br>
-        <strong>Стимулирующие выплаты:</strong> ${formatMoney(data.stimTotal)}<br>
-        <strong>Налоги и удержания:</strong> НДФЛ ${formatPercent(data.ndflRate, { minimumFractionDigits: 0, maximumFractionDigits: 1 })} — ${formatMoney(data.ndflAmount)}, прочие — ${formatMoney(data.otherWithholdings)}, всего — ${formatMoney(data.totalWithhold)}<br>
-        <strong>Итоги:</strong> начислено — ${formatMoney(data.grossSalary)}, на руки — ${formatMoney(data.netSalary)}<br>
-        Доля разовых замен в начислениях: <strong>${data.shareSubstPercent === null ? '—' : formatPercent(data.shareSubstPercent)}</strong><br>
-        Цена 1 часа доп. замены «на руки»: <strong>${data.substHourNet === null ? '—' : formatMoney(data.substHourNet)}</strong>
+        <div class="summary-section">
+          <div class="summary-section-title">Окладная часть</div>
+          <div class="summary-row"><span class="label">Оклад логопеда (Base_logoped)</span><span class="summary-money">${formatMoney(data.baseOklad)}</span></div>
+          <div class="summary-row"><span class="label">Учебная нагрузка по договору (O_teacher_contract)</span><span class="summary-money">${formatMoney(data.teacherContract)}</span></div>
+          <div class="summary-row"><span class="label">Учебная нагрузка по формуле (O_teacher_calc)</span><span class="summary-money">${formatMoney(data.teacherCalc)}</span></div>
+          <div class="summary-row"><span class="label">Δ по нагрузке (Delta_teacher)</span><span class="summary-money"><span class="summary-tag ${deltaClass}">${formatSignedMoney(data.teacherDelta)}</span></span></div>
+        </div>
+
+        <div class="summary-section">
+          <div class="summary-section-title">Доплаты</div>
+          <div class="summary-row"><span class="label">Дополнительные замены (Subst_extra)</span><span class="summary-money">${formatMoney(data.extraSubstitution)}</span></div>
+          <div class="summary-row"><span class="label">Компенсации (Comp_total)</span><span class="summary-money">${formatMoney(data.compTotal)}</span></div>
+          <div class="summary-subrow">ОВЗ — ${formatMoney(data.compOvz)} · Прочие — ${formatMoney(data.compOther)}</div>
+          <div class="summary-row"><span class="label">Стимулирующие (Stim_total)</span><span class="summary-money">${formatMoney(data.stimTotal)}</span></div>
+        </div>
+
+        <div class="summary-section">
+          <div class="summary-section-title">Налоги и удержания</div>
+          <div class="summary-row"><span class="label">НДФЛ (${formatPercent(data.ndflRate, { minimumFractionDigits: 0, maximumFractionDigits: 1 })})</span><span class="summary-money">${formatMoney(data.ndflAmount)}</span></div>
+          <div class="summary-row"><span class="label">Прочие удержания (Other_withholdings)</span><span class="summary-money">${formatMoney(data.otherWithholdings)}</span></div>
+          <div class="summary-row"><span class="label">Всего удержаний (Total_withhold)</span><span class="summary-money">${formatMoney(data.totalWithhold)}</span></div>
+          <div class="summary-row"><span class="label">Начислено (Gross_salary)</span><span class="summary-money">${formatMoney(data.grossSalary)}</span></div>
+          <div class="summary-row"><span class="label">На руки (Net_salary)</span><span class="summary-money">${formatMoney(data.netSalary)}</span></div>
+        </div>
+
+        <div class="summary-subrow" style="margin-top:10px">
+          <span class="label">Доля разовых замен</span> ${shareChip}
+          <span class="label" style="margin-left:12px">Цена 1 часа доп. замены «на руки»</span> ${data.substHourNet === null ? '—' : `<strong>${formatMoney(data.substHourNet)}</strong>`}
+        </div>
       `;
     }
 
