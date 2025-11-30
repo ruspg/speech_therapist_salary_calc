@@ -1077,6 +1077,7 @@
 
     let teacherLines = [];
     let lastSummarySnapshot = null;
+    let lastRSubCurrent = 0;
 
     function formatNumber(value, { minimumFractionDigits = 0, maximumFractionDigits = minimumFractionDigits } = {}) {
       return Number(value).toLocaleString('ru-RU', { minimumFractionDigits, maximumFractionDigits });
@@ -1430,6 +1431,7 @@
         ? (substRateMode === 'order' ? rSubExtra : uValue * nClassSubst * classTypeCoef)
         : 0;
       const zSubstExtra = useExtraSubst && hSubExtra > 0 ? hSubExtra * rSubCurrent : 0;
+      lastRSubCurrent = rSubCurrent;
 
       const substitutionIssues = [];
       if (useSubst && hSubst > 0) {
@@ -1447,7 +1449,7 @@
         if (substRateMode === 'order' && rSubExtra <= 0) {
           substitutionIssues.push('Для режима «по приказу» введите ставку R_sub_extra выше 0.');
         }
-        if (substRateMode === 'stu_hour' && (uValue <= 0 || nClassSubst <= 0)) {
+        if (substRateMode === 'student_hour' && (uValue <= 0 || nClassSubst <= 0)) {
           substitutionIssues.push('Для режима «по ученико-часу» задайте стоимость U и численность класса.');
         }
       }
@@ -1673,6 +1675,35 @@
         }
       });
     }
+
+    const testInputs = {
+      studentHourRate: () => {
+        setDefaults();
+        inputs.use_substitution.checked = false;
+        inputs.use_extra_subst.checked = true;
+        inputs.h_sub_extra.value = 5;
+        inputs.u_value.value = 150;
+        inputs.n_class_subst.value = 12;
+        inputs.class_type_subst.value = 'correctional';
+        substRateRadios.forEach((radio) => {
+          radio.checked = radio.value === 'student_hour';
+        });
+        handleToggles();
+        recalc();
+
+        const classTypeCoef = inputs.class_type_subst.value === 'correctional' ? CORRECTION_CLASS_COEF : 1;
+        const expectedRate = getValue('u_value') * getValue('n_class_subst') * classTypeCoef;
+
+        return {
+          name: 'studentHourRate',
+          expectedRate,
+          actualRate: lastRSubCurrent,
+          matches: Math.abs(lastRSubCurrent - expectedRate) < 0.01,
+        };
+      },
+    };
+
+    window.testInputs = testInputs;
 
     document.addEventListener('DOMContentLoaded', () => {
       enhanceTooltips();
