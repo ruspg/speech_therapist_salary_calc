@@ -831,8 +831,18 @@
   </div>
 
   <script>
-    // Salary calculator for speech therapist / teacher at School XXXX.
-    // Calculates base salary, teaching load, extra substitutions, compensations, bonuses, and taxes.
+    /**
+     * Salary calculator for speech therapist / teacher at School XXXX (Moscow).
+     * Calculates:
+     *  - base salary as speech therapist,
+     *  - teaching load as a teacher (formula 3.9, student-hour),
+     *  - extra substitutions beyond the contract,
+     *  - compensations (e.g. for special needs students),
+     *  - incentive payments,
+     *  - gross/net salary with taxes.
+     *
+     * All formulas and default values are synced with requirements.md.
+     */
     function mergeDescribedBy(control, id) {
       if (!control || !id) return;
       const existing = (control.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
