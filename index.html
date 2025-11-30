@@ -481,21 +481,21 @@
         <input id="worker_category" type="text" value="Иные педагогические работники (логопед/дефектолог)" readonly>
       </div>
       <div class="field">
-        <label for="c_stu">Стоимость 1 ученико-часа (C_stu) <span class="info" tabindex="0" data-tooltip="Нормативная стоимость одного ученико-часа по приказу/Положению об оплате труда.">?</span></label>
+        <label for="c_stu">Стоимость 1 ученико-часа (C_stu) <span class="info" tabindex="0" data-tooltip="Ставка за один ученико-час по положению об оплате труда; база для расчёта уроков. (student-hour rate)">?</span></label>
         <div class="input-with-unit">
           <input id="c_stu" type="number" min="0" step="1">
           <span class="unit-badge">₽/ученико-час</span>
         </div>
       </div>
       <div class="field">
-        <label for="weeks_year">Количество учебных недель (Weeks_year)</label>
+        <label for="weeks_year">Количество учебных недель (Weeks_year) <span class="info" tabindex="0" data-tooltip="Сколько учебных недель берётся в расчёт за год; обычно 33–36. (teaching weeks)">?</span></label>
         <div class="input-with-unit">
           <input id="weeks_year" type="number" min="1" max="52" step="1">
           <span class="unit-badge">нед.</span>
         </div>
       </div>
       <div class="field">
-        <label for="months_year">Количество месяцев в году (Months_year)</label>
+        <label for="months_year">Количество месяцев в году (Months_year) <span class="info" tabindex="0" data-tooltip="На сколько месяцев распределяется годовая сумма; в школе обычно 12. (months per year)">?</span></label>
         <div class="input-with-unit">
           <input id="months_year" type="number" value="12" readonly>
           <span class="unit-badge">мес.</span>
@@ -506,7 +506,7 @@
     <section>
       <h2>Оклад логопеда</h2>
       <div class="field">
-        <label for="t_logoped">Оклад логопеда за 1 ставку (O_logoped_base) <span class="info" tabindex="0" data-tooltip="Должностной оклад за полную ставку по трудовому договору или тарификационному списку, до удержаний НДФЛ.">?</span></label>
+        <label for="t_logoped">Оклад логопеда за 1 ставку (O_logoped_base) <span class="info" tabindex="0" data-tooltip="Размер оклада логопеда за полную ставку из трудового договора, до удержаний НДФЛ. (base salary)">?</span></label>
         <div class="input-with-unit">
           <input id="t_logoped" type="number" min="0" step="100">
           <span class="unit-badge">₽/мес</span>
@@ -523,7 +523,7 @@
     </section>
 
     <section>
-      <h2>Учебная нагрузка как учитель <span class="info" tabindex="0" data-tooltip="Укажите оплачиваемую нагрузку по предметам: количество обучающихся, часы в неделю и коэффициенты для расчёта формулы 3.9.">?</span></h2>
+      <h2>Учебная нагрузка как учитель <span class="info" tabindex="0" data-tooltip="Расчёт оплаты уроков: укажите численность, часы в неделю и коэффициенты из формулы 3.9. (teaching load)">?</span></h2>
       <div class="checkbox-row">
         <input id="use_teacher_load" type="checkbox" checked>
         <label for="use_teacher_load" style="margin:0">Учитывать учебную нагрузку</label>
@@ -537,24 +537,24 @@
           </div>
         </div>
         <div class="field">
-          <label>Состав класса (количество обучающихся) <span class="info" tabindex="0" data-tooltip="Укажите численность по трем групповым уровням. Подсказка: для кейса «6-р» оставьте значения 4, 0 и 0.">?</span></label>
+          <label>Состав класса (количество обучающихся) <span class="info" tabindex="0" data-tooltip="Сколько учеников в группах разных уровней: A1 слабый, A2 средний, A3 сильный. (class composition)">?</span></label>
           <div class="sub-grid">
             <div class="field" style="margin-bottom:0">
-              <label for="a1">A1</label>
+              <label for="a1">A1 <span class="info" tabindex="0" data-tooltip="Ученики базового уровня подготовки (уровень A1).">?</span></label>
               <div class="input-with-unit">
                 <input id="a1" type="number" min="0" step="1">
                 <span class="unit-badge">учеников</span>
               </div>
             </div>
             <div class="field" style="margin-bottom:0">
-              <label for="a2">A2</label>
+              <label for="a2">A2 <span class="info" tabindex="0" data-tooltip="Ученики среднего уровня подготовки (уровень A2).">?</span></label>
               <div class="input-with-unit">
                 <input id="a2" type="number" min="0" step="1">
                 <span class="unit-badge">учеников</span>
               </div>
             </div>
             <div class="field" style="margin-bottom:0">
-              <label for="a3">A3</label>
+              <label for="a3">A3 <span class="info" tabindex="0" data-tooltip="Ученики высокого уровня подготовки (уровень A3).">?</span></label>
               <div class="input-with-unit">
                 <input id="a3" type="number" min="0" step="1">
                 <span class="unit-badge">учеников</span>
@@ -601,7 +601,7 @@
     </section>
 
     <section>
-      <h2>Разовые замены <span class="info" tabindex="0" data-tooltip="Укажите часы замещений, численность класса и коэффициенты из приказов на замещение или локальных актов.">?</span></h2>
+      <h2>Разовые замены <span class="info" tabindex="0" data-tooltip="Разовые замещения уроков: часы, численность класса и ставка по приказу или ученико-часу. (extra substitutions)">?</span></h2>
       <div id="substitution_warning" class="warning-text" aria-live="polite"></div>
       <div class="checkbox-row" style="margin-top:4px">
         <input id="use_extra_subst" type="checkbox">
@@ -616,14 +616,14 @@
           </div>
         </div>
         <div class="field">
-          <label>Режим ставки (Subst_rate_mode)</label>
+          <label>Режим ставки (Subst_rate_mode) <span class="info" tabindex="0" data-tooltip="Как считать оплату: фиксированная ставка по приказу или по стоимости ученико-часа. (substitution rate mode)">?</span></label>
           <div class="flex-row" role="radiogroup" aria-labelledby="subst_rate_mode">
             <label><input type="radio" name="subst_rate_mode" value="order"> По приказу</label>
             <label><input type="radio" name="subst_rate_mode" value="stu_hour"> По ученико-часу</label>
           </div>
         </div>
         <div class="field">
-          <label for="u_value">Стоимость ученика-часа (U)</label>
+          <label for="u_value">Стоимость ученика-часа (U) <span class="info" tabindex="0" data-tooltip="Цена одного ученико-часа для расчёта замены по варианту «по ученико-часу». (student-hour rate U)">?</span></label>
           <div class="input-with-unit">
             <input id="u_value" type="number" min="0" step="1">
             <span class="unit-badge">₽/ученико-час</span>
@@ -637,7 +637,7 @@
           </div>
         </div>
         <div class="field">
-          <label for="n_class_subst">Численность класса для расчёта</label>
+          <label for="n_class_subst">Численность класса для расчёта <span class="info" tabindex="0" data-tooltip="Сколько учеников в классе, который вы заменяете; нужно для расчёта по ученико-часу. (class size)">?</span></label>
           <div class="input-with-unit">
             <input id="n_class_subst" type="number" min="0" step="1">
             <span class="unit-badge">учеников</span>
@@ -660,7 +660,7 @@
         <label for="use_compensations" style="margin:0">Учитывать компенсационные выплаты</label>
       </div>
       <div class="field">
-        <label>OVZ_base_mode: база для расчёта компенсации <span class="info" tabindex="0" data-tooltip="Выберите, от какого оклада считать процент за работу с ОВЗ: только логопедический или логопедический вместе с учительским.">?</span></label>
+        <label>OVZ_base_mode: база для расчёта компенсации <span class="info" tabindex="0" data-tooltip="От какой базы считать процент за работу с ОВЗ: только логопедический оклад или логопедический плюс учительский. (OVZ base)">?</span></label>
         <div class="flex-row" role="radiogroup" aria-label="OVZ_base_mode">
           <label><input type="radio" name="ovz_base_mode" value="logoped"> Логопедический</label>
           <label><input type="radio" name="ovz_base_mode" value="combined"> Логопедический + учительский</label>
@@ -668,7 +668,7 @@
       </div>
       <div class="sub-grid">
         <div class="field" style="margin-bottom:0">
-          <label for="k_ovz">% K_OVZ (0–20) <span class="info" tabindex="0" data-tooltip="Процентная доплата за работу с обучающимися с ОВЗ в соответствии с положением об оплате труда.">?</span></label>
+          <label for="k_ovz">% K_OVZ (0–20) <span class="info" tabindex="0" data-tooltip="Процент доплаты за работу с обучающимися с ОВЗ по локальному акту. (K_OVZ)">?</span></label>
           <div class="input-with-unit">
             <input id="k_ovz" type="number" min="0" max="20" step="0.1">
             <span class="unit-badge">%</span>
@@ -707,7 +707,7 @@
       <div id="stim_block">
         <div class="sub-grid">
           <div class="field" style="margin-bottom:0">
-            <label for="stim_part1">Стабильная стимулирующая (Stim_month) <span class="info" tabindex="0" data-tooltip="Ежемесячная фиксированная стимулирующая выплата (в т.ч. стабильная выплата 2025/2026).">?</span></label>
+            <label for="stim_part1">Стабильная стимулирующая (Stim_month) <span class="info" tabindex="0" data-tooltip="Ежемесячная фиксированная стимулирующая выплата, включая стабильную часть. (stable bonus)">?</span></label>
             <div class="input-with-unit">
               <input id="stim_part1" type="number" min="0" step="100">
               <span class="unit-badge">₽/мес</span>
@@ -1224,7 +1224,7 @@
         const kDivField = document.createElement('div');
         kDivField.className = 'field';
         const kDivLabel = document.createElement('label');
-        kDivLabel.textContent = 'K_div';
+        kDivLabel.innerHTML = 'K_div <span class="info" tabindex="0" data-tooltip="Коэффициент деления класса на группы; выше 1, если класс делится. (K_div)">?</span>';
         const kDivInput = document.createElement('input');
         kDivInput.type = 'number';
         kDivInput.min = '1';
@@ -1242,7 +1242,7 @@
         const kSubjField = document.createElement('div');
         kSubjField.className = 'field';
         const kSubjLabel = document.createElement('label');
-        kSubjLabel.textContent = 'K_subj';
+        kSubjLabel.innerHTML = 'K_subj <span class="info" tabindex="0" data-tooltip="Коэффициент предмета: надбавка за сложность или приоритет предмета. (K_subj)">?</span>';
         const kSubjInput = document.createElement('input');
         kSubjInput.type = 'number';
         kSubjInput.min = '1';
