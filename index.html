@@ -135,6 +135,10 @@
       display: none;
     }
 
+    .hidden {
+      display: none;
+    }
+
     .accordion-content {
       margin-top: 8px;
       line-height: 1.5;
@@ -293,6 +297,26 @@
     </section>
 
     <section>
+      <h2>Учебная нагрузка как учитель</h2>
+      <div class="checkbox-row">
+        <input id="use_teacher_load" type="checkbox" checked>
+        <label for="use_teacher_load" style="margin:0">Учитывать учебную нагрузку</label>
+      </div>
+      <div id="teacher_block">
+        <div class="field">
+          <label for="o_teacher_contract">Оклад за учебную нагрузку по договору, ₽</label>
+          <input id="o_teacher_contract" type="number" min="0" step="100">
+        </div>
+        <div class="field">
+          <label>Строки учебной нагрузки (по предметам)</label>
+          <div id="teacher_lines"></div>
+          <button id="add_teacher_line" class="btn-secondary" type="button" style="margin-top:6px">Добавить предмет</button>
+        </div>
+        <div class="muted" style="font-size:13px">Расчёт по формуле 3.9: O_line = C_stu × t_week × Weeks_year / Months_year × (K_div + K_subj − 1)</div>
+      </div>
+    </section>
+
+    <section>
       <div class="checkbox-row">
         <input id="use_substitution" type="checkbox" checked>
         <label for="use_substitution" style="margin:0">Учитывать замещающие уроки</label>
@@ -353,6 +377,10 @@
         <div class="accordion-content" id="logoped_breakdown"></div>
       </details>
       <details>
+        <summary>Учебная нагрузка</summary>
+        <div class="accordion-content" id="teacher_breakdown"></div>
+      </details>
+      <details>
         <summary>Замещающие уроки</summary>
         <div class="accordion-content" id="substitution_breakdown"></div>
       </details>
@@ -377,6 +405,8 @@
       months_year: 12,
       t_logoped: 70000,
       logoped_share: 1.0,
+      use_teacher_load: true,
+      o_teacher_contract: 0,
       use_substitution: true,
       h_subst: 12,
       n_students: 8,
@@ -399,6 +429,8 @@
       months_year: document.getElementById('months_year'),
       t_logoped: document.getElementById('t_logoped'),
       logoped_share: document.getElementById('logoped_share'),
+      use_teacher_load: document.getElementById('use_teacher_load'),
+      o_teacher_contract: document.getElementById('o_teacher_contract'),
       use_substitution: document.getElementById('use_substitution'),
       h_subst: document.getElementById('h_subst'),
       n_students: document.getElementById('n_students'),
@@ -415,13 +447,22 @@
     const summaryDisplay = document.getElementById('total_display');
     const summaryBreakdown = document.getElementById('summary_breakdown');
     const logopedBreakdown = document.getElementById('logoped_breakdown');
+    const teacherBreakdown = document.getElementById('teacher_breakdown');
     const substitutionBreakdown = document.getElementById('substitution_breakdown');
     const extrasBreakdown = document.getElementById('extras_breakdown');
+    const teacherBlock = document.getElementById('teacher_block');
+    const teacherLinesContainer = document.getElementById('teacher_lines');
+    const addTeacherLineBtn = document.getElementById('add_teacher_line');
     const substitutionBlock = document.getElementById('substitution_block');
     const resetBtn = document.getElementById('reset_btn');
     const copyBtn = document.getElementById('copy_btn');
     const mrotWarning = document.getElementById('mrot_warning');
     const MROT = 19372;
+
+    const defaultTeacherLines = [
+      { id: crypto.randomUUID(), subject: 'Русский язык (6-р)', t_week: 12, k_div: 6.25, k_subj: 1.1 },
+    ];
+    let teacherLines = [];
 
     function formatMoney(value) {
       return `${value.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`;
@@ -444,11 +485,111 @@
           field.value = value;
         }
       });
+      resetTeacherLines();
       handleToggles();
       recalc();
     }
 
+    function resetTeacherLines() {
+      teacherLines = defaultTeacherLines.map((line) => ({ ...line, id: crypto.randomUUID() }));
+      renderTeacherLines();
+    }
+
+    function renderTeacherLines() {
+      teacherLinesContainer.innerHTML = '';
+      teacherLines.forEach((line) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'sub-grid teacher-line';
+        wrapper.dataset.lineId = line.id;
+
+        const subjectField = document.createElement('div');
+        subjectField.className = 'field';
+        const subjectLabel = document.createElement('label');
+        subjectLabel.textContent = 'Предмет';
+        const subjectInput = document.createElement('input');
+        subjectInput.type = 'text';
+        subjectInput.value = line.subject;
+        subjectInput.addEventListener('input', (e) => {
+          line.subject = e.target.value;
+        });
+        subjectField.append(subjectLabel, subjectInput);
+
+        const hoursField = document.createElement('div');
+        hoursField.className = 'field';
+        const hoursLabel = document.createElement('label');
+        hoursLabel.textContent = 'Часов в неделю (t_week)';
+        const hoursInput = document.createElement('input');
+        hoursInput.type = 'number';
+        hoursInput.min = '0';
+        hoursInput.step = '0.5';
+        hoursInput.value = line.t_week;
+        hoursInput.addEventListener('input', (e) => {
+          line.t_week = Number(e.target.value);
+          recalc();
+        });
+        hoursField.append(hoursLabel, hoursInput);
+
+        const kDivField = document.createElement('div');
+        kDivField.className = 'field';
+        const kDivLabel = document.createElement('label');
+        kDivLabel.textContent = 'K_div';
+        const kDivInput = document.createElement('input');
+        kDivInput.type = 'number';
+        kDivInput.min = '0';
+        kDivInput.step = '0.05';
+        kDivInput.value = line.k_div;
+        kDivInput.addEventListener('input', (e) => {
+          line.k_div = Number(e.target.value);
+          recalc();
+        });
+        kDivField.append(kDivLabel, kDivInput);
+
+        const kSubjField = document.createElement('div');
+        kSubjField.className = 'field';
+        const kSubjLabel = document.createElement('label');
+        kSubjLabel.textContent = 'K_subj';
+        const kSubjInput = document.createElement('input');
+        kSubjInput.type = 'number';
+        kSubjInput.min = '0';
+        kSubjInput.step = '0.05';
+        kSubjInput.value = line.k_subj;
+        kSubjInput.addEventListener('input', (e) => {
+          line.k_subj = Number(e.target.value);
+          recalc();
+        });
+        kSubjField.append(kSubjLabel, kSubjInput);
+
+        const removeField = document.createElement('div');
+        removeField.className = 'field';
+        const removeLabel = document.createElement('label');
+        removeLabel.textContent = 'Удалить строку';
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn-secondary';
+        removeBtn.textContent = 'Удалить';
+        removeBtn.addEventListener('click', () => {
+          teacherLines = teacherLines.filter((item) => item.id !== line.id);
+          renderTeacherLines();
+          recalc();
+        });
+        removeField.append(removeLabel, removeBtn);
+
+        wrapper.append(subjectField, hoursField, kDivField, kSubjField, removeField);
+        teacherLinesContainer.appendChild(wrapper);
+      });
+      handleToggles();
+    }
+
     function handleToggles() {
+      const teacherEnabled = inputs.use_teacher_load.checked;
+      teacherBlock.classList.toggle('hidden', !teacherEnabled);
+      [...teacherBlock.querySelectorAll('input, button')].forEach((el) => {
+        if (el.id !== 'use_teacher_load') {
+          el.disabled = !teacherEnabled;
+        }
+      });
+      addTeacherLineBtn.disabled = !teacherEnabled;
+
       const substitutionEnabled = inputs.use_substitution.checked;
       [...substitutionBlock.querySelectorAll('input')].forEach((el) => {
         if (el.id !== 'use_substitution') {
@@ -470,6 +611,15 @@
       const baseOklad = tLogoped * share;
       const zLogoped = baseOklad;
 
+      const cStu = parseNumber(inputs.c_stu);
+      const weeksYear = parseNumber(inputs.weeks_year);
+      const monthsYear = parseNumber(inputs.months_year);
+
+      const useTeacher = inputs.use_teacher_load.checked;
+      const oTeacherContract = useTeacher ? parseNumber(inputs.o_teacher_contract) : 0;
+
+      const teacherCalc = useTeacher ? calculateTeacherLoad(cStu, weeksYear, monthsYear) : { total: 0, lines: [] };
+
       const useSubst = inputs.use_substitution.checked;
       const hSubst = useSubst ? parseNumber(inputs.h_subst) : 0;
       const nStudents = useSubst ? parseNumber(inputs.n_students) : 0;
@@ -487,11 +637,13 @@
       const useStim = inputs.use_stim.checked;
       const zStim = useStim ? parseNumber(inputs.stim_sum) : 0;
 
-      const total = zLogoped + zSubst + zComp + zStim;
+      const total = zLogoped + oTeacherContract + zSubst + zComp + zStim;
 
       summaryDisplay.textContent = `Итоговая сумма за месяц: ${formatMoney(total)}`;
       summaryBreakdown.innerHTML = `
         Оклад логопеда: <strong>${formatMoney(zLogoped)}</strong><br>
+        Учебная нагрузка (по договору): <strong>${formatMoney(oTeacherContract)}</strong><br>
+        Учебная нагрузка (по формуле): <strong>${formatMoney(teacherCalc.total)}</strong><br>
         Замещение: <strong>${formatMoney(zSubst)}</strong><br>
         Компенсации: <strong>${formatMoney(zComp)}</strong><br>
         Стимулирующие: <strong>${formatMoney(zStim)}</strong>
@@ -502,6 +654,14 @@
         = ${formatMoney(tLogoped)} × ${share.toFixed(2)}<br>
         = <strong>${formatMoney(zLogoped)}</strong>
       `;
+
+      const teacherDelta = teacherCalc.total - oTeacherContract;
+      teacherBreakdown.innerHTML = useTeacher ? `
+        По договору: <strong>${formatMoney(oTeacherContract)}</strong><br>
+        По формуле: <strong>${formatMoney(teacherCalc.total)}</strong><br>
+        Разница: <strong>${formatMoney(teacherDelta)}</strong><br><br>
+        ${teacherCalc.lines.join('<br>') || 'Строки нагрузки не указаны.'}
+      ` : 'Учебная нагрузка не учитывается.';
 
       substitutionBreakdown.innerHTML = useSubst ? `
         Стоимость часа: C_ч = U × N_учеников × K_corr × K_subst × K_усл_subst<br>
@@ -523,6 +683,23 @@
       }
     }
 
+    function calculateTeacherLoad(cStu, weeksYear, monthsYear) {
+      let total = 0;
+      const lines = [];
+
+      teacherLines.forEach((line, index) => {
+        const tWeek = Math.max(0, Number(line.t_week) || 0);
+        const kDiv = Math.max(0, Number(line.k_div) || 0);
+        const kSubj = Math.max(0, Number(line.k_subj) || 0);
+        const kTotal = Math.max(0, kDiv + kSubj - 1);
+        const oLine = cStu * tWeek * weeksYear / monthsYear * kTotal;
+        total += oLine;
+        lines.push(`Строка ${index + 1} (${line.subject || 'без названия'}): ${formatMoney(oLine)} (t_week=${tWeek.toFixed(2)}, K_div=${kDiv.toFixed(2)}, K_subj=${kSubj.toFixed(2)}, K_total=${kTotal.toFixed(2)})`);
+      });
+
+      return { total, lines };
+    }
+
     function attachListeners() {
       Object.values(inputs).forEach((el) => {
         el.addEventListener('input', () => {
@@ -536,6 +713,12 @@
       });
 
       resetBtn.addEventListener('click', setDefaults);
+
+      addTeacherLineBtn.addEventListener('click', () => {
+        teacherLines.push({ id: crypto.randomUUID(), subject: '', t_week: 0, k_div: 1, k_subj: 1 });
+        renderTeacherLines();
+        recalc();
+      });
 
       copyBtn.addEventListener('click', async () => {
         const text = `Итоговая сумма: ${summaryDisplay.textContent.replace('Итоговая сумма за месяц: ', '')}\n` +
