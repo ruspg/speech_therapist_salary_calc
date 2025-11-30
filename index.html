@@ -291,6 +291,99 @@
       font-weight: 600;
     }
 
+    .toggle-row {
+      justify-content: space-between;
+    }
+
+    .toggle-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      color: #1f2933;
+      position: relative;
+      user-select: none;
+    }
+
+    .toggle-control input {
+      position: absolute;
+      opacity: 0;
+      inset: 0;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .toggle-slider {
+      width: 46px;
+      height: 26px;
+      background: #d7e1e9;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      position: relative;
+      transition: background 0.2s ease, border-color 0.2s ease;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+    }
+
+    .toggle-slider::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .toggle-control input:checked + .toggle-slider {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 4px 10px rgba(33, 104, 105, 0.24);
+    }
+
+    .toggle-control input:checked + .toggle-slider::after {
+      transform: translateX(18px);
+    }
+
+    .toggle-control input:focus-visible + .toggle-slider {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+      box-shadow: 0 0 0 3px rgba(19, 78, 74, 0.15);
+    }
+
+    .toggle-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1f2933;
+    }
+
+    .toggle-control input:not(:checked) ~ .toggle-text {
+      color: #52606d;
+      font-weight: 600;
+    }
+
+    .toggle-section {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      padding: 12px 12px 8px;
+      transition: background 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+    }
+
+    #use_teacher_load:not(:checked) ~ #teacher_block,
+    #use_extra_subst:not(:checked) ~ #extra_subst_block {
+      background: #f3f5f8;
+      opacity: 0.6;
+      filter: grayscale(0.08);
+    }
+
+    #teacher_block.hidden {
+      display: block;
+    }
+
     .sub-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -670,11 +763,14 @@
     <section>
       <h2>Учебная нагрузка как учитель <span class="info" tabindex="0" data-tooltip="Расчёт оплаты уроков: укажите численность, часы в неделю и коэффициенты из формулы 3.9. (teaching load)">?</span></h2>
       <p class="section-note">Этот блок помогает проверить расчёт суммы в дополнительном соглашении, где указан оклад за учебную нагрузку. Можно сравнить сумму по договору и сумму по формуле 3.9 (ученико-час).</p>
-      <div class="checkbox-row">
-        <input id="use_teacher_load" type="checkbox" checked>
-        <label for="use_teacher_load" style="margin:0">Учитывать учебную нагрузку</label>
+      <div class="checkbox-row toggle-row">
+        <label class="toggle-control" for="use_teacher_load">
+          <input id="use_teacher_load" type="checkbox" checked>
+          <span class="toggle-slider" aria-hidden="true"></span>
+          <span class="toggle-text">Учитывать учебную нагрузку</span>
+        </label>
       </div>
-      <div id="teacher_block">
+      <div id="teacher_block" class="toggle-section">
         <div class="field">
           <label for="o_teacher_contract">Оклад за учебную нагрузку по договору, ₽</label>
           <div class="input-with-unit">
@@ -751,11 +847,14 @@
       <p class="section-note">Этот блок считает дополнительные замены сверх вашей тарификации. Здесь учитываются уроки, которые вы ведёте за коллег по приказу или по ставке ученико-часа, отдельно от оклада по договору.</p>
       <div id="substitution_warning" class="warning-text" aria-live="polite"></div>
       <div id="extra_subst_warning" class="warning-text warning" aria-live="polite"></div>
-      <div class="checkbox-row" style="margin-top:4px">
-        <input id="use_extra_subst" type="checkbox">
-        <label for="use_extra_subst" style="margin:0">Учитывать дополнительное замещение</label>
+      <div class="checkbox-row toggle-row" style="margin-top:4px">
+        <label class="toggle-control" for="use_extra_subst">
+          <input id="use_extra_subst" type="checkbox">
+          <span class="toggle-slider" aria-hidden="true"></span>
+          <span class="toggle-text">Учитывать дополнительное замещение</span>
+        </label>
       </div>
-      <div class="sub-grid" id="extra_subst_block">
+      <div class="sub-grid toggle-section" id="extra_subst_block">
         <div class="field">
           <label for="h_sub_extra">Дополнительные часы (H_sub_extra)</label>
           <div class="input-with-unit">
