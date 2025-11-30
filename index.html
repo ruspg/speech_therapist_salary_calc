@@ -308,6 +308,24 @@
           <input id="o_teacher_contract" type="number" min="0" step="100">
         </div>
         <div class="field">
+          <label>Состав класса (количество обучающихся) <span class="info" tabindex="0" data-tooltip="Укажите численность по трем групповым уровням. Подсказка: для кейса «6-р» оставьте значения 4, 0 и 0.">?</span></label>
+          <div class="sub-grid">
+            <div class="field" style="margin-bottom:0">
+              <label for="a1">A1</label>
+              <input id="a1" type="number" min="0" step="1">
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label for="a2">A2</label>
+              <input id="a2" type="number" min="0" step="1">
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label for="a3">A3</label>
+              <input id="a3" type="number" min="0" step="1">
+            </div>
+          </div>
+          <div id="teacher_warning" class="warning-text" aria-live="polite"></div>
+        </div>
+        <div class="field">
           <label>Строки учебной нагрузки (по предметам)</label>
           <div id="teacher_lines"></div>
           <button id="add_teacher_line" class="btn-secondary" type="button" style="margin-top:6px">Добавить предмет</button>
@@ -406,6 +424,9 @@
       t_logoped: 70000,
       logoped_share: 1.0,
       use_teacher_load: true,
+      a1: 4,
+      a2: 0,
+      a3: 0,
       o_teacher_contract: 0,
       use_substitution: true,
       h_subst: 12,
@@ -430,6 +451,9 @@
       t_logoped: document.getElementById('t_logoped'),
       logoped_share: document.getElementById('logoped_share'),
       use_teacher_load: document.getElementById('use_teacher_load'),
+      a1: document.getElementById('a1'),
+      a2: document.getElementById('a2'),
+      a3: document.getElementById('a3'),
       o_teacher_contract: document.getElementById('o_teacher_contract'),
       use_substitution: document.getElementById('use_substitution'),
       h_subst: document.getElementById('h_subst'),
@@ -457,6 +481,7 @@
     const resetBtn = document.getElementById('reset_btn');
     const copyBtn = document.getElementById('copy_btn');
     const mrotWarning = document.getElementById('mrot_warning');
+    const teacherWarning = document.getElementById('teacher_warning');
     const MROT = 19372;
 
     const defaultTeacherLines = [
@@ -617,6 +642,11 @@
 
       const useTeacher = inputs.use_teacher_load.checked;
       const oTeacherContract = useTeacher ? parseNumber(inputs.o_teacher_contract) : 0;
+      const a1 = useTeacher ? parseNumber(inputs.a1) : 0;
+      const a2 = useTeacher ? parseNumber(inputs.a2) : 0;
+      const a3 = useTeacher ? parseNumber(inputs.a3) : 0;
+      const studentSum = a1 + a2 + a3;
+      const hasTeacherLoad = useTeacher && (oTeacherContract > 0 || teacherLines.some((line) => (Number(line.t_week) || 0) > 0));
 
       const teacherCalc = useTeacher ? calculateTeacherLoad(cStu, weeksYear, monthsYear) : { total: 0, lines: [] };
 
@@ -680,6 +710,12 @@
         mrotWarning.textContent = `Внимание: расчетный оклад ниже МРОТ (${formatMoney(MROT)}). Проверьте доплаты.`;
       } else {
         mrotWarning.textContent = '';
+      }
+
+      if (hasTeacherLoad && studentSum === 0) {
+        teacherWarning.textContent = 'Предупреждение: a1 + a2 + a3 = 0 при заданной учебной нагрузке. Уточните численность обучающихся.';
+      } else {
+        teacherWarning.textContent = '';
       }
     }
 
