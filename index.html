@@ -602,51 +602,7 @@
 
     <section>
       <h2>Разовые замены <span class="info" tabindex="0" data-tooltip="Укажите часы замещений, численность класса и коэффициенты из приказов на замещение или локальных актов.">?</span></h2>
-      <div class="sub-grid hidden" id="substitution_block">
-        <div class="field">
-          <label for="h_subst">Часы замещения в месяц</label>
-          <div class="input-with-unit">
-            <input id="h_subst" type="number" min="0" step="1">
-            <span class="unit-badge">ч/мес</span>
-          </div>
-        </div>
-        <div class="field">
-          <label for="n_students">Количество учеников в классе/группе</label>
-          <div class="input-with-unit">
-            <input id="n_students" type="number" min="1" max="25" step="1">
-            <span class="unit-badge">учеников</span>
-          </div>
-        </div>
-        <div class="field">
-          <label for="k_corr">K_corr: коэффициент за работу с детьми с умственной отсталостью <span class="info" tabindex="0" data-tooltip="Повышающий коэффициент за коррекционность. Обычно 1.2–1.4.">?</span></label>
-          <div class="input-with-unit">
-            <input id="k_corr" type="number" min="0" step="0.05">
-            <span class="unit-badge">коэфф.</span>
-          </div>
-        </div>
-        <div class="field">
-          <label for="k_subst">K_subst: коэффициент за замещение отсутствующего учителя <span class="info" tabindex="0" data-tooltip="Оплата за фактическое замещение. Обычно 1.05–1.2.">?</span></label>
-          <div class="input-with-unit">
-            <input id="k_subst" type="number" min="0" step="0.05">
-            <span class="unit-badge">коэфф.</span>
-          </div>
-        </div>
-        <div class="field">
-          <label for="k_usl_subst">Коэффициент условий труда (замещение) <span class="info" tabindex="0" data-tooltip="Особые условия при замещении. Обычно 1.0–1.2.">?</span></label>
-          <div class="input-with-unit">
-            <input id="k_usl_subst" type="number" min="0" step="0.05">
-            <span class="unit-badge">коэфф.</span>
-          </div>
-        </div>
-        <div class="field">
-          <label for="u_value">Стоимость ученика-часа, ₽</label>
-          <div class="input-with-unit">
-            <input id="u_value" type="number" min="0" step="1">
-            <span class="unit-badge">₽/ученико-час</span>
-          </div>
-        </div>
-      </div>
-      <div id="substitution_warning" class="warning-text" aria-live="polite">Блок базовых замещений отключён: используйте настройки «Дополнительного замещения» ниже.</div>
+      <div id="substitution_warning" class="warning-text" aria-live="polite"></div>
       <div class="checkbox-row" style="margin-top:4px">
         <input id="use_extra_subst" type="checkbox">
         <label for="use_extra_subst" style="margin:0">Учитывать дополнительное замещение</label>
@@ -664,6 +620,13 @@
           <div class="flex-row" role="radiogroup" aria-labelledby="subst_rate_mode">
             <label><input type="radio" name="subst_rate_mode" value="order"> По приказу</label>
             <label><input type="radio" name="subst_rate_mode" value="stu_hour"> По ученико-часу</label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="u_value">Стоимость ученика-часа (U)</label>
+          <div class="input-with-unit">
+            <input id="u_value" type="number" min="0" step="1">
+            <span class="unit-badge">₽/ученико-час</span>
           </div>
         </div>
         <div class="field">
@@ -930,12 +893,6 @@
         a2: 0,
         a3: 0,
         o_teacher_contract: 31869.33,
-        use_substitution: false,
-        h_subst: 16,
-        n_students: 10,
-        k_corr: 1.25,
-        k_subst: 1.15,
-        k_usl_subst: 1.05,
         u_value: 37,
         use_extra_subst: false,
         h_sub_extra: 0,
@@ -978,12 +935,6 @@
       a2: document.getElementById('a2'),
       a3: document.getElementById('a3'),
       o_teacher_contract: document.getElementById('o_teacher_contract'),
-      use_substitution: document.getElementById('use_substitution'),
-      h_subst: document.getElementById('h_subst'),
-      n_students: document.getElementById('n_students'),
-      k_corr: document.getElementById('k_corr'),
-      k_subst: document.getElementById('k_subst'),
-      k_usl_subst: document.getElementById('k_usl_subst'),
       u_value: document.getElementById('u_value'),
       use_extra_subst: document.getElementById('use_extra_subst'),
       h_sub_extra: document.getElementById('h_sub_extra'),
@@ -1028,7 +979,6 @@
     const teacherBlock = document.getElementById('teacher_block');
     const teacherLinesContainer = document.getElementById('teacher_lines');
     const addTeacherLineBtn = document.getElementById('add_teacher_line');
-    const substitutionBlock = document.getElementById('substitution_block');
     const extraSubstBlock = document.getElementById('extra_subst_block');
     const resetBtn = document.getElementById('reset_btn');
     const copyBtn = document.getElementById('copy_btn');
@@ -1053,11 +1003,6 @@
       a1: { min: 0, max: 40, step: 1, label: 'A1' },
       a2: { min: 0, max: 40, step: 1, label: 'A2' },
       a3: { min: 0, max: 40, step: 1, label: 'A3' },
-      h_subst: { min: 0, max: 200, step: 1, label: 'H_subst' },
-      n_students: { min: 1, max: 35, step: 1, label: 'N_students' },
-      k_corr: { min: 0, max: 3, step: 0.05, label: 'K_corr' },
-      k_subst: { min: 0, max: 3, step: 0.05, label: 'K_subst' },
-      k_usl_subst: { min: 0, max: 3, step: 0.05, label: 'K_усл_subst' },
       u_value: { min: 0, max: 1000, step: 1, label: 'U' },
       h_sub_extra: { min: 0, max: 200, step: 1, label: 'H_sub_extra' },
       r_sub_extra: { min: 0, max: 20000, step: 50, label: 'R_sub_extra' },
@@ -1341,22 +1286,7 @@
       });
       addTeacherLineBtn.disabled = !teacherEnabled;
 
-      const substitutionCheckbox = inputs.use_substitution;
-      if (substitutionCheckbox) {
-        substitutionCheckbox.checked = false;
-        substitutionCheckbox.disabled = true;
-      }
-      const substitutionEnabled = Boolean(substitutionCheckbox?.checked);
       const extraSubstitutionEnabled = inputs.use_extra_subst.checked;
-      const shouldEnableUValue = substitutionEnabled || extraSubstitutionEnabled;
-      [...substitutionBlock.querySelectorAll('input')].forEach((el) => {
-        if (el.id === 'u_value') {
-          el.disabled = !shouldEnableUValue;
-          return;
-        }
-        el.disabled = !substitutionEnabled;
-      });
-
       [...extraSubstBlock.querySelectorAll('input, select')].forEach((el) => {
         if (el.id !== 'use_extra_subst') {
           el.disabled = !extraSubstitutionEnabled;
@@ -1419,17 +1349,8 @@
 
       const teacherCalc = useTeacher ? calculateTeacherLoad(cStu, weeksYear, monthsYear, a1, a2, a3) : { total: 0, lines: [] };
 
-      const useSubst = false;
-      const hSubst = 0;
-      const nStudents = 0;
-      const kCorr = 0;
-      const kSubst = 0;
-      const kUslSubst = 0;
       const useExtraSubst = inputs.use_extra_subst.checked;
-      const uValue = (useSubst || useExtraSubst) ? getValue('u_value') : 0;
-
-      const cHour = 0;
-      const zSubst = 0;
+      const uValue = useExtraSubst ? getValue('u_value') : 0;
 
       const substRateMode = Array.from(substRateRadios).find((radio) => radio.checked)?.value || defaults.inputs.subst_rate_mode;
       const hSubExtra = useExtraSubst ? getValue('h_sub_extra') : 0;
@@ -1444,7 +1365,10 @@
       lastRSubCurrent = rSubCurrent;
 
       const substitutionIssues = [];
-      if (useExtraSubst && hSubExtra > 0) {
+      if (useExtraSubst) {
+        if (hSubExtra <= 0) {
+          substitutionIssues.push('Укажите количество часов H_sub_extra выше 0.');
+        }
         if (substRateMode === 'order' && rSubExtra <= 0) {
           substitutionIssues.push('Для режима «по приказу» введите ставку R_sub_extra выше 0.');
         }
@@ -1452,8 +1376,7 @@
           substitutionIssues.push('Для режима «по ученико-часу» задайте стоимость U и численность класса.');
         }
       }
-      const baseSubstDisabledNote = 'Блок базовых замещений отключён: используйте настройки «Дополнительного замещения».';
-      substitutionWarning.textContent = substitutionIssues.join(' ') || baseSubstDisabledNote;
+      substitutionWarning.textContent = substitutionIssues.join(' ');
 
       const useComp = inputs.use_compensations.checked;
       const ovzBaseMode = Array.from(ovzBaseRadios).find((radio) => radio.checked)?.value || defaults.inputs.ovz_base_mode;
@@ -1499,7 +1422,6 @@
         teacherContract: oTeacherContract,
         teacherCalc: teacherCalc.total,
         teacherDelta,
-        baseSubstitution: zSubst,
         extraSubstitution: zSubstExtra,
         compTotal,
         compOvz,
@@ -1545,8 +1467,6 @@
         teacherDeltaChip.classList.add('delta-negative');
       }
 
-      const baseSubstitutionText = 'Базовое замещение отключено (устаревший блок). Оплата рассчитывается только в секции «Дополнительное замещение».';
-
       const extraRateText = substRateMode === 'order'
         ? `Режим «по приказу»: R_sub_current = ${formatMoney(rSubCurrent)}`
         : `Режим «по ученико-часу»: R_sub_current = U × N_class_subst × K_class = ${formatMoney(uValue)} × ${formatNumber(nClassSubst)} × ${formatNumber(classTypeCoef, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} = <strong>${formatMoney(rSubCurrent)}</strong>`;
@@ -1562,7 +1482,7 @@
         Subst_hour_net = ${substHourNet === null ? '—' : `<strong>${formatMoney(substHourNet)}</strong>`}
       `;
 
-      substitutionBreakdown.innerHTML = `${baseSubstitutionText}<br><br>${extraSubstitutionText}<br><br>${substitutionStatsText}`;
+      substitutionBreakdown.innerHTML = `${extraSubstitutionText}<br><br>${substitutionStatsText}`;
 
       const compText = useComp ? `
         OVZ_base_mode: ${ovzBaseMode === 'combined' ? 'логопедический + учительский' : 'логопедический'}<br>
@@ -1677,9 +1597,6 @@
     const testInputs = {
       studentHourRate: () => {
         setDefaults();
-        if (inputs.use_substitution) {
-          inputs.use_substitution.checked = false;
-        }
         inputs.use_extra_subst.checked = true;
         inputs.h_sub_extra.value = 5;
         inputs.u_value.value = 150;
@@ -1716,7 +1633,7 @@
       return `
         <strong>Оклад логопеда:</strong> ${formatMoney(data.baseOklad)}<br>
         <strong>Учебная нагрузка:</strong> договор — ${formatMoney(data.teacherContract)}, формула — ${formatMoney(data.teacherCalc)}, Δ — ${formatSignedMoney(data.teacherDelta)}<br>
-        <strong>Разовые замены:</strong> базовый блок отключён; доп. — ${formatMoney(data.extraSubstitution)}<br>
+        <strong>Разовые замены:</strong> доп. — ${formatMoney(data.extraSubstitution)}<br>
         <strong>Компенсации:</strong> ${formatMoney(data.compTotal)} (ОВЗ — ${formatMoney(data.compOvz)}, прочие — ${formatMoney(data.compOther)})<br>
         <strong>Стимулирующие:</strong> ${formatMoney(data.stimTotal)}<br>
         <strong>Налоги и удержания:</strong> НДФЛ ${formatPercent(data.ndflRate, { minimumFractionDigits: 0, maximumFractionDigits: 1 })} — ${formatMoney(data.ndflAmount)}, прочие — ${formatMoney(data.otherWithholdings)}, всего — ${formatMoney(data.totalWithhold)}<br>
@@ -1735,7 +1652,7 @@
         `Брутто: ${formatMoney(data.grossSalary)}`,
         `Оклад логопеда: ${formatMoney(data.baseOklad)}`,
         `Учебная нагрузка: договор — ${formatMoney(data.teacherContract)}, формула — ${formatMoney(data.teacherCalc)}, Δ — ${formatSignedMoney(data.teacherDelta)}`,
-        `Разовые замены: базовый блок отключён; доп. — ${formatMoney(data.extraSubstitution)}`,
+        `Разовые замены: доп. — ${formatMoney(data.extraSubstitution)}`,
         `Компенсации: ${formatMoney(data.compTotal)} (ОВЗ — ${formatMoney(data.compOvz)}, прочие — ${formatMoney(data.compOther)})`,
         `Стимулирующие: ${formatMoney(data.stimTotal)}`,
         `Налоги: НДФЛ ${formatPercent(data.ndflRate, { minimumFractionDigits: 0, maximumFractionDigits: 1 })} — ${formatMoney(data.ndflAmount)}, прочие — ${formatMoney(data.otherWithholdings)}, всего — ${formatMoney(data.totalWithhold)}`,
