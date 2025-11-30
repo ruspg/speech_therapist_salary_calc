@@ -56,7 +56,8 @@
       color: #fff;
       border: none;
       position: sticky;
-      top: 0;
+      top: -10px;
+      inset-inline: 0;
       z-index: 20;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
     }
@@ -831,42 +832,48 @@
 
   <script>
     const defaults = {
-      period: '2025/2026',
-      organization: 'ГБОУ Школа № XXXX',
-      worker_category: 'Иные педагогические работники (логопед/дефектолог)',
-      c_stu: 37,
-      weeks_year: 34,
-      months_year: 12,
-      t_logoped: 70000,
-      logoped_share: 1.0,
-      use_teacher_load: true,
-      a1: 4,
-      a2: 0,
-      a3: 0,
-      o_teacher_contract: 31869.33,
-      use_substitution: true,
-      h_subst: 12,
-      n_students: 8,
-      k_corr: 1.3,
-      k_subst: 1.1,
-      k_usl_subst: 1.0,
-      u_value: 37,
-      use_extra_subst: false,
-      h_sub_extra: 0,
-      subst_rate_mode: 'order',
-      r_sub_extra: 700,
-      n_class_subst: 0,
-      class_type_subst: 'regular',
-      use_compensations: true,
-      ovz_base_mode: 'logoped',
-      k_ovz: 20,
-      comp_other: 0,
-      use_stim: true,
-      stim_part1: 3000,
-      stim_part2: 0,
-      stim_part3: 0,
-      ndfl_rate: 13,
-      other_withholdings: 0,
+      inputs: {
+        period: '2025/2026',
+        organization: 'ГБОУ Школа № XXXX',
+        worker_category: 'Иные педагогические работники (логопед/дефектолог)',
+        c_stu: 37,
+        weeks_year: 34,
+        months_year: 12,
+        t_logoped: 78000,
+        logoped_share: 1.0,
+        use_teacher_load: true,
+        a1: 6,
+        a2: 0,
+        a3: 0,
+        o_teacher_contract: 35000,
+        use_substitution: true,
+        h_subst: 16,
+        n_students: 10,
+        k_corr: 1.25,
+        k_subst: 1.15,
+        k_usl_subst: 1.05,
+        u_value: 37,
+        use_extra_subst: true,
+        h_sub_extra: 8,
+        subst_rate_mode: 'order',
+        r_sub_extra: 900,
+        n_class_subst: 10,
+        class_type_subst: 'correctional',
+        use_compensations: true,
+        ovz_base_mode: 'combined',
+        k_ovz: 30,
+        comp_other: 0,
+        use_stim: true,
+        stim_part1: 6000,
+        stim_part2: 0,
+        stim_part3: 0,
+        ndfl_rate: 13,
+        other_withholdings: 0,
+      },
+      teacherLines: [
+        { id: crypto.randomUUID(), subject: 'Русский язык (6-р)', t_week: 12, k_div: 6.25, k_subj: 1.1 },
+        { id: crypto.randomUUID(), subject: 'Литература (6-р)', t_week: 6, k_div: 6.25, k_subj: 1.0 },
+      ],
     };
 
     const inputs = {
@@ -944,10 +951,8 @@
     const compOvzField = document.getElementById('comp_ovz');
     const compTotalField = document.getElementById('comp_total');
 
-    const defaultTeacherLines = [
-      { id: crypto.randomUUID(), subject: 'Русский язык (6-р)', t_week: 12, k_div: 6.25, k_subj: 1.1 },
-    ];
     let teacherLines = [];
+    let lastSummarySnapshot = null;
 
     function formatMoney(value) {
       return `${value.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`;
@@ -985,7 +990,7 @@
     }
 
     function setDefaults() {
-      Object.entries(defaults).forEach(([key, value]) => {
+      Object.entries(defaults.inputs).forEach(([key, value]) => {
         const field = inputs[key];
         if (!field) return;
         if (field.type === 'checkbox') {
@@ -995,10 +1000,10 @@
         }
       });
       substRateRadios.forEach((radio) => {
-        radio.checked = radio.value === defaults.subst_rate_mode;
+        radio.checked = radio.value === defaults.inputs.subst_rate_mode;
       });
       ovzBaseRadios.forEach((radio) => {
-        radio.checked = radio.value === defaults.ovz_base_mode;
+        radio.checked = radio.value === defaults.inputs.ovz_base_mode;
       });
       resetTeacherLines();
       handleToggles();
@@ -1006,7 +1011,7 @@
     }
 
     function resetTeacherLines() {
-      teacherLines = defaultTeacherLines.map((line) => ({ ...line, id: crypto.randomUUID() }));
+      teacherLines = defaults.teacherLines.map((line) => ({ ...line, id: crypto.randomUUID() }));
       renderTeacherLines();
     }
 
@@ -1173,7 +1178,7 @@
       const cHour = useSubst ? uValue * nStudents * kCorr * kSubst * kUslSubst : 0;
       const zSubst = hSubst * cHour;
 
-      const substRateMode = Array.from(substRateRadios).find((radio) => radio.checked)?.value || defaults.subst_rate_mode;
+      const substRateMode = Array.from(substRateRadios).find((radio) => radio.checked)?.value || defaults.inputs.subst_rate_mode;
       const hSubExtra = useExtraSubst ? parseNumber(inputs.h_sub_extra) : 0;
       const rSubExtra = useExtraSubst ? parseNumber(inputs.r_sub_extra) : 0;
       const nClassSubst = useExtraSubst ? parseNumber(inputs.n_class_subst) : 0;
@@ -1185,7 +1190,7 @@
       const zSubstExtra = useExtraSubst && hSubExtra > 0 ? hSubExtra * rSubCurrent : 0;
 
       const useComp = inputs.use_compensations.checked;
-      const ovzBaseMode = Array.from(ovzBaseRadios).find((radio) => radio.checked)?.value || defaults.ovz_base_mode;
+      const ovzBaseMode = Array.from(ovzBaseRadios).find((radio) => radio.checked)?.value || defaults.inputs.ovz_base_mode;
       const kOvz = useComp ? parseNumber(inputs.k_ovz) : 0;
       const compOther = useComp ? parseNumber(inputs.comp_other) : 0;
       const ovzBase = ovzBaseMode === 'combined' ? baseOklad + oTeacherContract : baseOklad;
@@ -1223,19 +1228,30 @@
 
       netDisplay.textContent = formatMoney(netSalary);
       grossDisplay.textContent = formatMoney(grossSalary);
-      const summaryText = `
-        <strong>Оклад логопеда:</strong> ${formatMoney(zLogoped)}<br>
-        <strong>Учебная нагрузка:</strong> договор — ${formatMoney(oTeacherContract)}, формула — ${formatMoney(teacherCalc.total)}, Δ — ${formatSignedMoney(teacherDelta)}<br>
-        <strong>Разовые замены:</strong> базовые — ${formatMoney(zSubst)}, доп. — ${formatMoney(zSubstExtra)}<br>
-        <strong>Компенсации:</strong> ${formatMoney(compTotal)} (ОВЗ — ${formatMoney(compOvz)}, прочие — ${formatMoney(compOther)})<br>
-        <strong>Стимулирующие:</strong> ${formatMoney(zStim)}<br>
-        <strong>Налоги и удержания:</strong> НДФЛ ${ndflRate.toFixed(1).replace(/\.0$/, '')}% — ${formatMoney(ndflAmount)}, прочие — ${formatMoney(otherWithholdings)}, всего — ${formatMoney(totalWithhold)}<br>
-        <strong>Итоги:</strong> Gross_salary — ${formatMoney(grossSalary)}, Net_salary — ${formatMoney(netSalary)}<br>
-        Доля разовых замен в Gross_salary: <strong>${shareSubstPercent === null ? '—' : formatPercent(shareSubstPercent)}</strong><br>
-        Цена 1 часа доп. замены «на руки»: <strong>${substHourNet === null ? '—' : formatMoney(substHourNet)}</strong>
-      `;
-      summaryBreakdown.innerHTML = summaryText;
-      totalsBreakdown.innerHTML = summaryText;
+      const summaryData = {
+        baseOklad: zLogoped,
+        teacherContract: oTeacherContract,
+        teacherCalc: teacherCalc.total,
+        teacherDelta,
+        baseSubstitution: zSubst,
+        extraSubstitution: zSubstExtra,
+        compTotal,
+        compOvz,
+        compOther,
+        stimTotal: zStim,
+        ndflRate,
+        ndflAmount,
+        otherWithholdings,
+        totalWithhold,
+        grossSalary,
+        netSalary,
+        shareSubstPercent,
+        substHourNet,
+      };
+
+      summaryBreakdown.innerHTML = buildSummaryHtml(summaryData);
+      totalsBreakdown.innerHTML = buildSummaryHtml(summaryData);
+      lastSummarySnapshot = summaryData;
 
       logopedBreakdown.innerHTML = `
         Формула: Base_logoped = O_logoped_base × S_log<br>
@@ -1382,8 +1398,7 @@
       });
 
       copyBtn.addEventListener('click', async () => {
-        const text = `На руки: ${netDisplay.textContent}; Брутто: ${grossDisplay.textContent}\n` +
-          summaryBreakdown.innerText.replace(/\s+/g, ' ').trim();
+        const text = buildCopyText(lastSummarySnapshot);
         try {
           await navigator.clipboard.writeText(text);
           copyBtn.textContent = 'Скопировано!';
@@ -1399,6 +1414,39 @@
       setDefaults();
       attachListeners();
     });
+
+    function buildSummaryHtml(data) {
+      return `
+        <strong>Оклад логопеда:</strong> ${formatMoney(data.baseOklad)}<br>
+        <strong>Учебная нагрузка:</strong> договор — ${formatMoney(data.teacherContract)}, формула — ${formatMoney(data.teacherCalc)}, Δ — ${formatSignedMoney(data.teacherDelta)}<br>
+        <strong>Разовые замены:</strong> базовые — ${formatMoney(data.baseSubstitution)}, доп. — ${formatMoney(data.extraSubstitution)}<br>
+        <strong>Компенсации:</strong> ${formatMoney(data.compTotal)} (ОВЗ — ${formatMoney(data.compOvz)}, прочие — ${formatMoney(data.compOther)})<br>
+        <strong>Стимулирующие:</strong> ${formatMoney(data.stimTotal)}<br>
+        <strong>Налоги и удержания:</strong> НДФЛ ${data.ndflRate.toFixed(1).replace(/\.0$/, '')}% — ${formatMoney(data.ndflAmount)}, прочие — ${formatMoney(data.otherWithholdings)}, всего — ${formatMoney(data.totalWithhold)}<br>
+        <strong>Итоги:</strong> Gross_salary — ${formatMoney(data.grossSalary)}, Net_salary — ${formatMoney(data.netSalary)}<br>
+        Доля разовых замен в Gross_salary: <strong>${data.shareSubstPercent === null ? '—' : formatPercent(data.shareSubstPercent)}</strong><br>
+        Цена 1 часа доп. замены «на руки»: <strong>${data.substHourNet === null ? '—' : formatMoney(data.substHourNet)}</strong>
+      `;
+    }
+
+    function buildCopyText(data) {
+      if (!data) return '';
+      const shareText = data.shareSubstPercent === null ? '—' : formatPercent(data.shareSubstPercent);
+      const substNet = data.substHourNet === null ? '—' : formatMoney(data.substHourNet);
+      return [
+        `На руки: ${formatMoney(data.netSalary)}`,
+        `Брутто: ${formatMoney(data.grossSalary)}`,
+        `Оклад логопеда: ${formatMoney(data.baseOklad)}`,
+        `Учебная нагрузка: договор — ${formatMoney(data.teacherContract)}, формула — ${formatMoney(data.teacherCalc)}, Δ — ${formatSignedMoney(data.teacherDelta)}`,
+        `Разовые замены: базовые — ${formatMoney(data.baseSubstitution)}, доп. — ${formatMoney(data.extraSubstitution)}`,
+        `Компенсации: ${formatMoney(data.compTotal)} (ОВЗ — ${formatMoney(data.compOvz)}, прочие — ${formatMoney(data.compOther)})`,
+        `Стимулирующие: ${formatMoney(data.stimTotal)}`,
+        `Налоги: НДФЛ ${data.ndflRate.toFixed(1).replace(/\.0$/, '')}% — ${formatMoney(data.ndflAmount)}, прочие — ${formatMoney(data.otherWithholdings)}, всего — ${formatMoney(data.totalWithhold)}`,
+        `Итоги: Gross_salary — ${formatMoney(data.grossSalary)}, Net_salary — ${formatMoney(data.netSalary)}`,
+        `Доля разовых замен: ${shareText}`,
+        `Цена часа доп. замены «на руки»: ${substNet}`,
+      ].join('\n');
+    }
   </script>
 </body>
 </html>
