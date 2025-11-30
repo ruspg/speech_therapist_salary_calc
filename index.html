@@ -602,11 +602,7 @@
 
     <section>
       <h2>Разовые замены <span class="info" tabindex="0" data-tooltip="Укажите часы замещений, численность класса и коэффициенты из приказов на замещение или локальных актов.">?</span></h2>
-      <div class="checkbox-row">
-        <input id="use_substitution" type="checkbox">
-        <label for="use_substitution" style="margin:0">Учитывать замещающие уроки</label>
-      </div>
-      <div class="sub-grid" id="substitution_block">
+      <div class="sub-grid hidden" id="substitution_block">
         <div class="field">
           <label for="h_subst">Часы замещения в месяц</label>
           <div class="input-with-unit">
@@ -650,7 +646,7 @@
           </div>
         </div>
       </div>
-      <div id="substitution_warning" class="warning-text" aria-live="polite"></div>
+      <div id="substitution_warning" class="warning-text" aria-live="polite">Блок базовых замещений отключён: используйте настройки «Дополнительного замещения» ниже.</div>
       <div class="checkbox-row" style="margin-top:4px">
         <input id="use_extra_subst" type="checkbox">
         <label for="use_extra_subst" style="margin:0">Учитывать дополнительное замещение</label>
@@ -667,7 +663,7 @@
           <label>Режим ставки (Subst_rate_mode)</label>
           <div class="flex-row" role="radiogroup" aria-labelledby="subst_rate_mode">
             <label><input type="radio" name="subst_rate_mode" value="order"> По приказу</label>
-            <label><input type="radio" name="subst_rate_mode" value="student_hour"> По ученико-часу</label>
+            <label><input type="radio" name="subst_rate_mode" value="stu_hour"> По ученико-часу</label>
           </div>
         </div>
         <div class="field">
@@ -1334,7 +1330,9 @@
       });
       addTeacherLineBtn.disabled = !teacherEnabled;
 
-      const substitutionEnabled = inputs.use_substitution.checked;
+      inputs.use_substitution.checked = false;
+      inputs.use_substitution.disabled = true;
+      const substitutionEnabled = false;
       const extraSubstitutionEnabled = inputs.use_extra_subst.checked;
       const shouldEnableUValue = substitutionEnabled || extraSubstitutionEnabled;
       [...substitutionBlock.querySelectorAll('input')].forEach((el) => {
@@ -1409,17 +1407,17 @@
 
       const teacherCalc = useTeacher ? calculateTeacherLoad(cStu, weeksYear, monthsYear) : { total: 0, lines: [] };
 
-      const useSubst = inputs.use_substitution.checked;
-      const hSubst = useSubst ? getValue('h_subst') : 0;
-      const nStudents = useSubst ? getValue('n_students') : 0;
-      const kCorr = useSubst ? getValue('k_corr') : 0;
-      const kSubst = useSubst ? getValue('k_subst') : 0;
-      const kUslSubst = useSubst ? getValue('k_usl_subst') : 0;
+      const useSubst = false;
+      const hSubst = 0;
+      const nStudents = 0;
+      const kCorr = 0;
+      const kSubst = 0;
+      const kUslSubst = 0;
       const useExtraSubst = inputs.use_extra_subst.checked;
       const uValue = (useSubst || useExtraSubst) ? getValue('u_value') : 0;
 
-      const cHour = useSubst ? uValue * nStudents * kCorr * kSubst * kUslSubst : 0;
-      const zSubst = useSubst ? hSubst * cHour : 0;
+      const cHour = 0;
+      const zSubst = 0;
 
       const substRateMode = Array.from(substRateRadios).find((radio) => radio.checked)?.value || defaults.inputs.subst_rate_mode;
       const hSubExtra = useExtraSubst ? getValue('h_sub_extra') : 0;
@@ -1434,26 +1432,16 @@
       lastRSubCurrent = rSubCurrent;
 
       const substitutionIssues = [];
-      if (useSubst && hSubst > 0) {
-        if (nStudents <= 0) {
-          substitutionIssues.push('Укажите количество учеников для расчёта замещения.');
-        }
-        if (uValue <= 0) {
-          substitutionIssues.push('Стоимость ученико-часа должна быть больше 0 для замещения.');
-        }
-        if (kCorr === 0 || kSubst === 0 || kUslSubst === 0) {
-          substitutionIssues.push('Проверьте коэффициенты замещения — они должны быть выше 0.');
-        }
-      }
       if (useExtraSubst && hSubExtra > 0) {
         if (substRateMode === 'order' && rSubExtra <= 0) {
           substitutionIssues.push('Для режима «по приказу» введите ставку R_sub_extra выше 0.');
         }
-        if (substRateMode === 'student_hour' && (uValue <= 0 || nClassSubst <= 0)) {
+        if (substRateMode === 'stu_hour' && (uValue <= 0 || nClassSubst <= 0)) {
           substitutionIssues.push('Для режима «по ученико-часу» задайте стоимость U и численность класса.');
         }
       }
-      substitutionWarning.textContent = substitutionIssues.join(' ');
+      const baseSubstDisabledNote = 'Блок базовых замещений отключён: используйте настройки «Дополнительного замещения».';
+      substitutionWarning.textContent = substitutionIssues.join(' ') || baseSubstDisabledNote;
 
       const useComp = inputs.use_compensations.checked;
       const ovzBaseMode = Array.from(ovzBaseRadios).find((radio) => radio.checked)?.value || defaults.inputs.ovz_base_mode;
@@ -1545,13 +1533,7 @@
         teacherDeltaChip.classList.add('delta-negative');
       }
 
-      const baseSubstitutionText = useSubst ? `
-        Стоимость часа: C_ч = U × N_учеников × K_corr × K_subst × K_усл_subst<br>
-        = ${formatMoney(uValue)} × ${formatNumber(nStudents)} × ${formatNumber(kCorr, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} × ${formatNumber(kSubst, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} × ${formatNumber(kUslSubst, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br>
-        = <strong>${formatMoney(cHour)}</strong><br><br>
-        Итог за месяц (не включается в Gross_salary): Z_subst = H_subst × C_ч = ${formatNumber(hSubst)} × ${formatMoney(cHour)}<br>
-        = <strong>${formatMoney(zSubst)}</strong>
-      ` : 'Базовое замещение не учитывается.';
+      const baseSubstitutionText = 'Базовое замещение отключено (устаревший блок). Оплата рассчитывается только в секции «Дополнительное замещение».';
 
       const extraRateText = substRateMode === 'order'
         ? `Режим «по приказу»: R_sub_current = ${formatMoney(rSubCurrent)}`
@@ -1686,7 +1668,7 @@
         inputs.n_class_subst.value = 12;
         inputs.class_type_subst.value = 'correctional';
         substRateRadios.forEach((radio) => {
-          radio.checked = radio.value === 'student_hour';
+          radio.checked = radio.value === 'stu_hour';
         });
         handleToggles();
         recalc();
@@ -1716,7 +1698,7 @@
       return `
         <strong>Оклад логопеда:</strong> ${formatMoney(data.baseOklad)}<br>
         <strong>Учебная нагрузка:</strong> договор — ${formatMoney(data.teacherContract)}, формула — ${formatMoney(data.teacherCalc)}, Δ — ${formatSignedMoney(data.teacherDelta)}<br>
-        <strong>Разовые замены:</strong> базовые — ${formatMoney(data.baseSubstitution)} (не в gross), доп. — ${formatMoney(data.extraSubstitution)}<br>
+        <strong>Разовые замены:</strong> базовый блок отключён; доп. — ${formatMoney(data.extraSubstitution)}<br>
         <strong>Компенсации:</strong> ${formatMoney(data.compTotal)} (ОВЗ — ${formatMoney(data.compOvz)}, прочие — ${formatMoney(data.compOther)})<br>
         <strong>Стимулирующие:</strong> ${formatMoney(data.stimTotal)}<br>
         <strong>Налоги и удержания:</strong> НДФЛ ${formatPercent(data.ndflRate, { minimumFractionDigits: 0, maximumFractionDigits: 1 })} — ${formatMoney(data.ndflAmount)}, прочие — ${formatMoney(data.otherWithholdings)}, всего — ${formatMoney(data.totalWithhold)}<br>
@@ -1735,7 +1717,7 @@
         `Брутто: ${formatMoney(data.grossSalary)}`,
         `Оклад логопеда: ${formatMoney(data.baseOklad)}`,
         `Учебная нагрузка: договор — ${formatMoney(data.teacherContract)}, формула — ${formatMoney(data.teacherCalc)}, Δ — ${formatSignedMoney(data.teacherDelta)}`,
-        `Разовые замены: базовые — ${formatMoney(data.baseSubstitution)}, доп. — ${formatMoney(data.extraSubstitution)}`,
+        `Разовые замены: базовый блок отключён; доп. — ${formatMoney(data.extraSubstitution)}`,
         `Компенсации: ${formatMoney(data.compTotal)} (ОВЗ — ${formatMoney(data.compOvz)}, прочие — ${formatMoney(data.compOther)})`,
         `Стимулирующие: ${formatMoney(data.stimTotal)}`,
         `Налоги: НДФЛ ${formatPercent(data.ndflRate, { minimumFractionDigits: 0, maximumFractionDigits: 1 })} — ${formatMoney(data.ndflAmount)}, прочие — ${formatMoney(data.otherWithholdings)}, всего — ${formatMoney(data.totalWithhold)}`,
