@@ -430,6 +430,7 @@
     </section>
 
     <section>
+      <h2>Разовые замены</h2>
       <div class="checkbox-row">
         <input id="use_substitution" type="checkbox" checked>
         <label for="use_substitution" style="margin:0">Учитывать замещающие уроки</label>
@@ -495,7 +496,7 @@
     </section>
 
     <section>
-      <h2>Доплаты</h2>
+      <h2>Компенсации</h2>
       <div class="checkbox-row">
         <input id="use_compensations" type="checkbox" checked>
         <label for="use_compensations" style="margin:0">Учитывать компенсационные выплаты</label>
@@ -525,8 +526,11 @@
           <input id="comp_total" type="number" readonly>
         </div>
       </div>
+    </section>
 
-      <div class="checkbox-row" style="margin-top:4px">
+    <section>
+      <h2>Стимулирующие выплаты</h2>
+      <div class="checkbox-row">
         <input id="use_stim" type="checkbox" checked>
         <label for="use_stim" style="margin:0">Учитывать стимулирующие выплаты</label>
       </div>
@@ -553,7 +557,7 @@
     </section>
 
     <section>
-      <h2>Удержания</h2>
+      <h2>Налоги и удержания</h2>
       <div class="sub-grid">
         <div class="field" style="margin-bottom:0">
           <label for="ndfl_rate">Ставка НДФЛ, %</label>
@@ -575,8 +579,28 @@
     </section>
 
     <section>
-      <h2>Расшифровка</h2>
+      <h2>Помощь и нормативные документы</h2>
+      <details>
+        <summary>Открыть справку</summary>
+        <div class="accordion-content">
+          <p>Ключевые подсказки для корректного ввода данных:</p>
+          <ul>
+            <li>Проверьте актуальность стоимости ученико-часа и коэффициентов по последнему приказу учреждения.</li>
+            <li>Для замещений уточняйте коэффициенты K_corr и K_subst в локальных актах (обычно 1.05–1.2).</li>
+            <li>Ставку НДФЛ и удержания вводите в соответствии с персональными условиями сотрудника.</li>
+          </ul>
+          <p class="muted">Приказ об оплате труда, Положение о стимулирующих и локальные нормативные акты школы помогут быстро заполнить форму.</p>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <h2>Итоги и расшифровка</h2>
       <details open>
+        <summary>Краткие итоги</summary>
+        <div class="accordion-content" id="totals_breakdown"></div>
+      </details>
+      <details>
         <summary>Оклад логопеда</summary>
         <div class="accordion-content" id="logoped_breakdown"></div>
       </details>
@@ -585,12 +609,20 @@
         <div class="accordion-content" id="teacher_breakdown"></div>
       </details>
       <details>
-        <summary>Замещающие уроки</summary>
+        <summary>Разовые замены</summary>
         <div class="accordion-content" id="substitution_breakdown"></div>
       </details>
       <details>
-        <summary>Компенсации и стимулирующие</summary>
-        <div class="accordion-content" id="extras_breakdown"></div>
+        <summary>Компенсации</summary>
+        <div class="accordion-content" id="comp_breakdown"></div>
+      </details>
+      <details>
+        <summary>Стимулирующие выплаты</summary>
+        <div class="accordion-content" id="stim_breakdown"></div>
+      </details>
+      <details>
+        <summary>Налоги и удержания</summary>
+        <div class="accordion-content" id="taxes_breakdown"></div>
       </details>
       <div class="buttons">
         <button class="btn-secondary" id="reset_btn" type="button">Сбросить к значениям по умолчанию</button>
@@ -678,6 +710,7 @@
 
     const summaryDisplay = document.getElementById('total_display');
     const summaryBreakdown = document.getElementById('summary_breakdown');
+    const totalsBreakdown = document.getElementById('totals_breakdown');
     const logopedBreakdown = document.getElementById('logoped_breakdown');
     const teacherBreakdown = document.getElementById('teacher_breakdown');
     const teacherContractDisplay = document.getElementById('teacher_contract_display');
@@ -687,7 +720,9 @@
     const teacherCalcChip = document.getElementById('teacher_calc_chip');
     const teacherDeltaChip = document.getElementById('teacher_delta_chip');
     const substitutionBreakdown = document.getElementById('substitution_breakdown');
-    const extrasBreakdown = document.getElementById('extras_breakdown');
+    const compBreakdown = document.getElementById('comp_breakdown');
+    const stimBreakdown = document.getElementById('stim_breakdown');
+    const taxesBreakdown = document.getElementById('taxes_breakdown');
     const teacherBlock = document.getElementById('teacher_block');
     const teacherLinesContainer = document.getElementById('teacher_lines');
     const addTeacherLineBtn = document.getElementById('add_teacher_line');
@@ -974,25 +1009,19 @@
       const teacherDelta = teacherCalc.total - oTeacherContract;
 
       summaryDisplay.textContent = `На руки (Net_salary): ${formatMoney(netSalary)} • Брутто (Gross_salary): ${formatMoney(grossSalary)}`;
-      summaryBreakdown.innerHTML = `
-        Оклад логопеда: <strong>${formatMoney(zLogoped)}</strong><br>
-        Учебная нагрузка (по договору): <strong>${formatMoney(oTeacherContract)}</strong><br>
-        Учебная нагрузка (по формуле): <strong>${formatMoney(teacherCalc.total)}</strong><br>
-        Разница (формула − договор): <strong>${formatMoney(teacherDelta)}</strong><br>
-        Замещение (базовое): <strong>${formatMoney(zSubst)}</strong><br>
-        Замещение (доп.): <strong>${formatMoney(zSubstExtra)}</strong><br>
-        Компенсация за ОВЗ: <strong>${formatMoney(compOvz)}</strong><br>
-        Прочие компенсации: <strong>${formatMoney(compOther)}</strong><br>
-        Компенсации всего: <strong>${formatMoney(compTotal)}</strong><br>
-        Стимулирующие: <strong>${formatMoney(zStim)}</strong><br>
-        Gross_salary: <strong>${formatMoney(grossSalary)}</strong><br>
-        НДФЛ (${ndflRate.toFixed(1).replace(/\.0$/, '')}%): <strong>${formatMoney(ndflAmount)}</strong><br>
-        Прочие удержания: <strong>${formatMoney(otherWithholdings)}</strong><br>
-        Удержания всего: <strong>${formatMoney(totalWithhold)}</strong><br>
-        Net_salary: <strong>${formatMoney(netSalary)}</strong><br>
-        Доля разовых замен в Gross_salary (Share_subst_percent): <strong>${shareSubstPercent === null ? '—' : formatPercent(shareSubstPercent)}</strong><br>
-        Цена 1 часа доп. замены «на руки» (Subst_hour_net): <strong>${substHourNet === null ? '—' : formatMoney(substHourNet)}</strong>
+      const summaryText = `
+        <strong>Оклад логопеда:</strong> ${formatMoney(zLogoped)}<br>
+        <strong>Учебная нагрузка:</strong> договор — ${formatMoney(oTeacherContract)}, формула — ${formatMoney(teacherCalc.total)}, Δ — ${formatSignedMoney(teacherDelta)}<br>
+        <strong>Разовые замены:</strong> базовые — ${formatMoney(zSubst)}, доп. — ${formatMoney(zSubstExtra)}<br>
+        <strong>Компенсации:</strong> ${formatMoney(compTotal)} (ОВЗ — ${formatMoney(compOvz)}, прочие — ${formatMoney(compOther)})<br>
+        <strong>Стимулирующие:</strong> ${formatMoney(zStim)}<br>
+        <strong>Налоги и удержания:</strong> НДФЛ ${ndflRate.toFixed(1).replace(/\.0$/, '')}% — ${formatMoney(ndflAmount)}, прочие — ${formatMoney(otherWithholdings)}, всего — ${formatMoney(totalWithhold)}<br>
+        <strong>Итоги:</strong> Gross_salary — ${formatMoney(grossSalary)}, Net_salary — ${formatMoney(netSalary)}<br>
+        Доля разовых замен в Gross_salary: <strong>${shareSubstPercent === null ? '—' : formatPercent(shareSubstPercent)}</strong><br>
+        Цена 1 часа доп. замены «на руки»: <strong>${substHourNet === null ? '—' : formatMoney(substHourNet)}</strong>
       `;
+      summaryBreakdown.innerHTML = summaryText;
+      totalsBreakdown.innerHTML = summaryText;
 
       logopedBreakdown.innerHTML = `
         Формула: Base_logoped = O_logoped_base × S_log<br>
@@ -1052,10 +1081,22 @@
         Comp_total = <strong>${formatMoney(compTotal)}</strong>
       ` : 'Компенсации не учитываются.';
 
-      extrasBreakdown.innerHTML = `
-        ${compText}<br>
-        Стимулирующие: ${useStim ? 'учитываются' : 'не учитываются'} — <strong>${formatMoney(zStim)}</strong>
+      const stimText = useStim ? `
+        Стимулирующие части: ${formatMoney(stimPart1)}, ${formatMoney(stimPart2)}, ${formatMoney(stimPart3)}<br>
+        Stim_total = <strong>${formatMoney(zStim)}</strong>
+      ` : 'Стимулирующие не учитываются.';
+
+      const taxesText = `
+        Gross_salary = <strong>${formatMoney(grossSalary)}</strong><br>
+        НДФЛ (${ndflRate.toFixed(1).replace(/\.0$/, '')}%): <strong>${formatMoney(ndflAmount)}</strong><br>
+        Прочие удержания: <strong>${formatMoney(otherWithholdings)}</strong><br>
+        Total_withhold = <strong>${formatMoney(totalWithhold)}</strong><br>
+        Net_salary = <strong>${formatMoney(netSalary)}</strong>
       `;
+
+      compBreakdown.innerHTML = compText;
+      stimBreakdown.innerHTML = stimText;
+      taxesBreakdown.innerHTML = taxesText;
 
       compOvzField.value = compOvz.toFixed(2);
       compTotalField.value = compTotal.toFixed(2);
