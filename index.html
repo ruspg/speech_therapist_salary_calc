@@ -367,6 +367,12 @@
       margin-top: -6px;
     }
 
+    .input-message {
+      color: var(--danger);
+      font-size: 13px;
+      margin-top: -4px;
+    }
+
     .flex-row {
       display: flex;
       align-items: center;
@@ -615,6 +621,7 @@
           </div>
         </div>
       </div>
+      <div id="substitution_warning" class="warning-text" aria-live="polite"></div>
       <div class="checkbox-row" style="margin-top:4px">
         <input id="use_extra_subst" type="checkbox">
         <label for="use_extra_subst" style="margin:0">Учитывать дополнительное замещение</label>
@@ -913,6 +920,12 @@
       other_withholdings: document.getElementById('other_withholdings'),
     };
 
+    Object.values(inputs).forEach((input) => {
+      if (input?.type === 'number') {
+        ensureMessageElement(input);
+      }
+    });
+
     const netDisplay = document.getElementById('net_display');
     const grossDisplay = document.getElementById('gross_display');
     const summaryBreakdown = document.getElementById('summary_breakdown');
@@ -938,6 +951,7 @@
     const copyBtn = document.getElementById('copy_btn');
     const mrotWarning = document.getElementById('mrot_warning');
     const teacherWarning = document.getElementById('teacher_warning');
+    const substitutionWarning = document.getElementById('substitution_warning');
     const stimBlock = document.getElementById('stim_block');
     const stimTotalField = document.getElementById('stim_total');
     const ndflAmountField = document.getElementById('ndfl_amount');
@@ -945,6 +959,42 @@
     const MROT = 19372;
     const CORRECTION_CLASS_COEF = 1.3;
     const DELTA_CLASSES = ['delta-positive', 'delta-negative'];
+
+    const validationRules = {
+      c_stu: { min: 0, max: 1000, step: 1, label: 'C_stu' },
+      weeks_year: { min: 1, max: 52, step: 1, label: 'Weeks_year' },
+      months_year: { min: 1, max: 12, step: 1, label: 'Months_year' },
+      t_logoped: { min: 0, max: 500000, step: 100, label: 'Оклад логопеда' },
+      logoped_share: { min: 0, max: 1, step: 0.25, label: 'Доля ставки' },
+      o_teacher_contract: { min: 0, max: 500000, step: 100, label: 'O_teacher_contract' },
+      a1: { min: 0, max: 40, step: 1, label: 'A1' },
+      a2: { min: 0, max: 40, step: 1, label: 'A2' },
+      a3: { min: 0, max: 40, step: 1, label: 'A3' },
+      h_subst: { min: 0, max: 200, step: 1, label: 'H_subst' },
+      n_students: { min: 1, max: 35, step: 1, label: 'N_students' },
+      k_corr: { min: 0, max: 3, step: 0.05, label: 'K_corr' },
+      k_subst: { min: 0, max: 3, step: 0.05, label: 'K_subst' },
+      k_usl_subst: { min: 0, max: 3, step: 0.05, label: 'K_усл_subst' },
+      u_value: { min: 0, max: 1000, step: 1, label: 'U' },
+      h_sub_extra: { min: 0, max: 200, step: 1, label: 'H_sub_extra' },
+      r_sub_extra: { min: 0, max: 20000, step: 50, label: 'R_sub_extra' },
+      n_class_subst: { min: 0, max: 35, step: 1, label: 'N_class_subst' },
+      k_ovz: { min: 0, max: 100, step: 1, label: 'K_OVZ' },
+      comp_other: { min: 0, max: 500000, step: 100, label: 'Comp_other' },
+      stim_part1: { min: 0, max: 300000, step: 100, label: 'Stim_part1' },
+      stim_part2: { min: 0, max: 300000, step: 100, label: 'Stim_part2' },
+      stim_part3: { min: 0, max: 300000, step: 100, label: 'Stim_part3' },
+      ndfl_rate: { min: 0, max: 100, step: 0.1, label: 'Ставка НДФЛ' },
+      other_withholdings: { min: 0, max: 500000, step: 100, label: 'Прочие удержания' },
+    };
+
+    const teacherLineRules = {
+      t_week: { min: 0, max: 40, step: 0.25, label: 't_week' },
+      k_div: { min: 1, max: 10, step: 0.1, label: 'K_div' },
+      k_subj: { min: 1, max: 5, step: 0.1, label: 'K_subj' },
+    };
+
+    const inputMessages = {};
 
     const substRateRadios = document.querySelectorAll('input[name="subst_rate_mode"]');
     const ovzBaseRadios = document.querySelectorAll('input[name="ovz_base_mode"]');
@@ -968,11 +1018,88 @@
       return `${value.toFixed(1)} %`;
     }
 
-    function parseNumber(input) {
-      const value = parseFloat(input.value);
-      const valid = Number.isFinite(value) && value >= 0;
-      input.classList.toggle('invalid', !valid);
-      return valid ? value : 0;
+    function ensureMessageElement(input) {
+      if (inputMessages[input.id]) return inputMessages[input.id];
+      const message = document.createElement('div');
+      message.id = `${input.id}_message`;
+      message.className = 'input-message';
+      input.closest('.field')?.appendChild(message);
+      inputMessages[input.id] = message;
+      return message;
+    }
+
+    function snapToStep(value, step) {
+      if (!step || step <= 0) return value;
+      const snapped = Math.round(value / step) * step;
+      return Number(snapped.toFixed(getPrecision(step)));
+    }
+
+    function getPrecision(step) {
+      const decimals = step.toString().split('.')[1];
+      return decimals ? decimals.length : 0;
+    }
+
+    function formatStepValue(value, step) {
+      const precision = getPrecision(step || 1);
+      return Number(value).toFixed(precision).replace(/\.0+$/, '');
+    }
+
+    function validateNumber(input, rule) {
+      const messageEl = ensureMessageElement(input);
+      if (input.disabled) {
+        input.classList.remove('invalid');
+        messageEl.textContent = '';
+        return Number.parseFloat(input.value) || 0;
+      }
+
+      const raw = (input.value || '').replace(',', '.');
+      let value = Number.parseFloat(raw);
+      const messages = [];
+
+      if (raw.trim() === '') {
+        messages.push('Заполните поле.');
+        value = 0;
+      }
+
+      if (!Number.isFinite(value)) {
+        messages.push('Используем 0 — не удалось распознать число.');
+        value = 0;
+      }
+
+      if (rule?.step) {
+        const snapped = snapToStep(value, rule.step);
+        if (snapped !== value) {
+          value = snapped;
+          input.value = formatStepValue(value, rule.step);
+          messages.push(`Шаг ввода ${rule.step}. Значение скорректировано.`);
+        }
+      }
+
+      if (rule?.min !== undefined && value < rule.min) {
+        value = rule.min;
+        input.value = formatStepValue(value, rule.step || 1);
+        messages.push(`Минимум ${rule.label || rule.min} — скорректировано.`);
+      }
+
+      if (rule?.max !== undefined && value > rule.max) {
+        value = rule.max;
+        input.value = formatStepValue(value, rule.step || 1);
+        messages.push(`Максимум ${rule.label || rule.max} — скорректировано.`);
+      }
+
+      if (messages.length) {
+        input.classList.add('invalid');
+        messageEl.textContent = messages.join(' ');
+      } else {
+        input.classList.remove('invalid');
+        messageEl.textContent = '';
+      }
+
+      return value;
+    }
+
+    function getValue(id) {
+      return validateNumber(inputs[id], validationRules[id]);
     }
 
     function createUnitBadge(text) {
@@ -1041,12 +1168,14 @@
         const hoursInput = document.createElement('input');
         hoursInput.type = 'number';
         hoursInput.min = '0';
-        hoursInput.step = '0.5';
+        hoursInput.step = teacherLineRules.t_week.step;
         hoursInput.value = line.t_week;
+        hoursInput.id = `${line.id}_t_week`;
         hoursInput.addEventListener('input', (e) => {
-          line.t_week = Number(e.target.value);
+          line.t_week = validateNumber(hoursInput, teacherLineRules.t_week);
           recalc();
         });
+        ensureMessageElement(hoursInput);
         hoursField.append(hoursLabel, wrapWithUnit(hoursInput, 'ч/нед'));
 
         const kDivField = document.createElement('div');
@@ -1056,12 +1185,14 @@
         const kDivInput = document.createElement('input');
         kDivInput.type = 'number';
         kDivInput.min = '1';
-        kDivInput.step = '0.05';
+        kDivInput.step = teacherLineRules.k_div.step;
         kDivInput.value = line.k_div;
+        kDivInput.id = `${line.id}_k_div`;
         kDivInput.addEventListener('input', (e) => {
-          line.k_div = Number(e.target.value);
+          line.k_div = validateNumber(kDivInput, teacherLineRules.k_div);
           recalc();
         });
+        ensureMessageElement(kDivInput);
         kDivField.append(kDivLabel, wrapWithUnit(kDivInput, 'коэфф.'));
 
         const kSubjField = document.createElement('div');
@@ -1071,12 +1202,14 @@
         const kSubjInput = document.createElement('input');
         kSubjInput.type = 'number';
         kSubjInput.min = '1';
-        kSubjInput.step = '0.05';
+        kSubjInput.step = teacherLineRules.k_subj.step;
         kSubjInput.value = line.k_subj;
+        kSubjInput.id = `${line.id}_k_subj`;
         kSubjInput.addEventListener('input', (e) => {
-          line.k_subj = Number(e.target.value);
+          line.k_subj = validateNumber(kSubjInput, teacherLineRules.k_subj);
           recalc();
         });
+        ensureMessageElement(kSubjInput);
         kSubjField.append(kSubjLabel, wrapWithUnit(kSubjInput, 'коэфф.'));
 
         const removeField = document.createElement('div');
@@ -1143,45 +1276,64 @@
       [...stimBlock.querySelectorAll('input')].forEach((el) => {
         el.disabled = !stimEnabled;
       });
+
+      clearMessagesForDisabled();
+    }
+
+    function clearMessagesForDisabled() {
+      Object.values(inputs).forEach((input) => {
+        if (input?.disabled && inputMessages[input.id]) {
+          input.classList.remove('invalid');
+          inputMessages[input.id].textContent = '';
+        }
+      });
+
+      document.querySelectorAll('.teacher-line input').forEach((input) => {
+        if (input.disabled) {
+          input.classList.remove('invalid');
+          const message = inputMessages[input.id];
+          if (message) message.textContent = '';
+        }
+      });
     }
 
     function recalc() {
-      const tLogoped = parseNumber(inputs.t_logoped);
-      const share = parseNumber(inputs.logoped_share);
+      const tLogoped = getValue('t_logoped');
+      const share = getValue('logoped_share');
 
       const baseOklad = tLogoped * share;
       const zLogoped = baseOklad;
 
-      const cStu = parseNumber(inputs.c_stu);
-      const weeksYear = parseNumber(inputs.weeks_year);
-      const monthsYear = parseNumber(inputs.months_year);
+      const cStu = getValue('c_stu');
+      const weeksYear = getValue('weeks_year');
+      const monthsYear = getValue('months_year');
 
       const useTeacher = inputs.use_teacher_load.checked;
-      const oTeacherContract = useTeacher ? parseNumber(inputs.o_teacher_contract) : 0;
-      const a1 = useTeacher ? parseNumber(inputs.a1) : 0;
-      const a2 = useTeacher ? parseNumber(inputs.a2) : 0;
-      const a3 = useTeacher ? parseNumber(inputs.a3) : 0;
+      const oTeacherContract = useTeacher ? getValue('o_teacher_contract') : 0;
+      const a1 = useTeacher ? getValue('a1') : 0;
+      const a2 = useTeacher ? getValue('a2') : 0;
+      const a3 = useTeacher ? getValue('a3') : 0;
       const studentSum = a1 + a2 + a3;
       const hasTeacherLoad = useTeacher && (oTeacherContract > 0 || teacherLines.some((line) => (Number(line.t_week) || 0) > 0));
 
       const teacherCalc = useTeacher ? calculateTeacherLoad(cStu, weeksYear, monthsYear) : { total: 0, lines: [] };
 
       const useSubst = inputs.use_substitution.checked;
-      const hSubst = useSubst ? parseNumber(inputs.h_subst) : 0;
-      const nStudents = useSubst ? parseNumber(inputs.n_students) : 0;
-      const kCorr = useSubst ? parseNumber(inputs.k_corr) : 0;
-      const kSubst = useSubst ? parseNumber(inputs.k_subst) : 0;
-      const kUslSubst = useSubst ? parseNumber(inputs.k_usl_subst) : 0;
+      const hSubst = useSubst ? getValue('h_subst') : 0;
+      const nStudents = useSubst ? getValue('n_students') : 0;
+      const kCorr = useSubst ? getValue('k_corr') : 0;
+      const kSubst = useSubst ? getValue('k_subst') : 0;
+      const kUslSubst = useSubst ? getValue('k_usl_subst') : 0;
       const useExtraSubst = inputs.use_extra_subst.checked;
-      const uValue = (useSubst || useExtraSubst) ? parseNumber(inputs.u_value) : 0;
+      const uValue = (useSubst || useExtraSubst) ? getValue('u_value') : 0;
 
       const cHour = useSubst ? uValue * nStudents * kCorr * kSubst * kUslSubst : 0;
       const zSubst = hSubst * cHour;
 
       const substRateMode = Array.from(substRateRadios).find((radio) => radio.checked)?.value || defaults.inputs.subst_rate_mode;
-      const hSubExtra = useExtraSubst ? parseNumber(inputs.h_sub_extra) : 0;
-      const rSubExtra = useExtraSubst ? parseNumber(inputs.r_sub_extra) : 0;
-      const nClassSubst = useExtraSubst ? parseNumber(inputs.n_class_subst) : 0;
+      const hSubExtra = useExtraSubst ? getValue('h_sub_extra') : 0;
+      const rSubExtra = useExtraSubst ? getValue('r_sub_extra') : 0;
+      const nClassSubst = useExtraSubst ? getValue('n_class_subst') : 0;
       const classTypeSubst = inputs.class_type_subst.value;
       const classTypeCoef = classTypeSubst === 'correctional' ? CORRECTION_CLASS_COEF : 1;
       const rSubCurrent = useExtraSubst && hSubExtra > 0
@@ -1189,31 +1341,53 @@
         : 0;
       const zSubstExtra = useExtraSubst && hSubExtra > 0 ? hSubExtra * rSubCurrent : 0;
 
+      const substitutionIssues = [];
+      if (useSubst && hSubst > 0) {
+        if (nStudents <= 0) {
+          substitutionIssues.push('Укажите количество учеников для расчёта замещения.');
+        }
+        if (uValue <= 0) {
+          substitutionIssues.push('Стоимость ученико-часа должна быть больше 0 для замещения.');
+        }
+        if (kCorr === 0 || kSubst === 0 || kUslSubst === 0) {
+          substitutionIssues.push('Проверьте коэффициенты замещения — они должны быть выше 0.');
+        }
+      }
+      if (useExtraSubst && hSubExtra > 0) {
+        if (substRateMode === 'order' && rSubExtra <= 0) {
+          substitutionIssues.push('Для режима «по приказу» введите ставку R_sub_extra выше 0.');
+        }
+        if (substRateMode === 'stu_hour' && (uValue <= 0 || nClassSubst <= 0)) {
+          substitutionIssues.push('Для режима «по ученико-часу» задайте стоимость U и численность класса.');
+        }
+      }
+      substitutionWarning.textContent = substitutionIssues.join(' ');
+
       const useComp = inputs.use_compensations.checked;
       const ovzBaseMode = Array.from(ovzBaseRadios).find((radio) => radio.checked)?.value || defaults.inputs.ovz_base_mode;
-      const kOvz = useComp ? parseNumber(inputs.k_ovz) : 0;
-      const compOther = useComp ? parseNumber(inputs.comp_other) : 0;
+      const kOvz = useComp ? getValue('k_ovz') : 0;
+      const compOther = useComp ? getValue('comp_other') : 0;
       const ovzBase = ovzBaseMode === 'combined' ? baseOklad + oTeacherContract : baseOklad;
       const compOvz = useComp ? ovzBase * (kOvz / 100) : 0;
       const compTotal = useComp ? compOvz + compOther : 0;
       const zComp = compTotal;
 
       const useStim = inputs.use_stim.checked;
-      const stimPart1 = useStim ? parseNumber(inputs.stim_part1) : 0;
-      const stimPart2 = useStim ? parseNumber(inputs.stim_part2) : 0;
-      const stimPart3 = useStim ? parseNumber(inputs.stim_part3) : 0;
+      const stimPart1 = useStim ? getValue('stim_part1') : 0;
+      const stimPart2 = useStim ? getValue('stim_part2') : 0;
+      const stimPart3 = useStim ? getValue('stim_part3') : 0;
       const zStim = useStim ? stimPart1 + stimPart2 + stimPart3 : 0;
       stimTotalField.value = zStim.toFixed(2);
 
       const grossTotal = zLogoped + oTeacherContract + zSubst + zSubstExtra + zComp + zStim;
       const grossSalary = grossTotal;
 
-      const ndflRateRaw = parseNumber(inputs.ndfl_rate);
+      const ndflRateRaw = getValue('ndfl_rate');
       const ndflRate = Math.min(100, ndflRateRaw);
       if (ndflRate !== ndflRateRaw) {
         inputs.ndfl_rate.value = ndflRate.toFixed(1).replace(/\.0$/, '');
       }
-      const otherWithholdings = parseNumber(inputs.other_withholdings);
+      const otherWithholdings = getValue('other_withholdings');
       const ndflAmount = grossTotal * (ndflRate / 100);
       const totalWithhold = ndflAmount + otherWithholdings;
       const netTotal = grossTotal - totalWithhold;
