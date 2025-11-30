@@ -659,6 +659,10 @@
       return `${value.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`;
     }
 
+    function formatPercent(value) {
+      return `${value.toFixed(1)} %`;
+    }
+
     function parseNumber(input) {
       const value = parseFloat(input.value);
       const valid = Number.isFinite(value) && value >= 0;
@@ -883,6 +887,7 @@
       stimTotalField.value = zStim.toFixed(2);
 
       const grossTotal = zLogoped + oTeacherContract + zSubst + zSubstExtra + zComp + zStim;
+      const grossSalary = grossTotal;
 
       const ndflRateRaw = parseNumber(inputs.ndfl_rate);
       const ndflRate = Math.min(100, ndflRateRaw);
@@ -893,10 +898,16 @@
       const ndflAmount = grossTotal * (ndflRate / 100);
       const totalWithhold = ndflAmount + otherWithholdings;
       const netTotal = grossTotal - totalWithhold;
+      const netSalary = grossSalary > 0 ? netTotal : 0;
+
+      const shareSubstPercent = grossSalary > 0 ? (zSubstExtra / grossSalary) * 100 : null;
+      const substHourNet = hSubExtra > 0
+        ? (zSubstExtra * (1 - ndflRate / 100)) / hSubExtra
+        : null;
 
       const teacherDelta = teacherCalc.total - oTeacherContract;
 
-      summaryDisplay.textContent = `Итоговая сумма к выплате: ${formatMoney(netTotal)}`;
+      summaryDisplay.textContent = `На руки (Net_salary): ${formatMoney(netSalary)} • Брутто (Gross_salary): ${formatMoney(grossSalary)}`;
       summaryBreakdown.innerHTML = `
         Оклад логопеда: <strong>${formatMoney(zLogoped)}</strong><br>
         Учебная нагрузка (по договору): <strong>${formatMoney(oTeacherContract)}</strong><br>
@@ -908,10 +919,13 @@
         Прочие компенсации: <strong>${formatMoney(compOther)}</strong><br>
         Компенсации всего: <strong>${formatMoney(compTotal)}</strong><br>
         Стимулирующие: <strong>${formatMoney(zStim)}</strong><br>
-        Начислено всего (брутто): <strong>${formatMoney(grossTotal)}</strong><br>
+        Gross_salary: <strong>${formatMoney(grossSalary)}</strong><br>
         НДФЛ (${ndflRate.toFixed(1).replace(/\.0$/, '')}%): <strong>${formatMoney(ndflAmount)}</strong><br>
         Прочие удержания: <strong>${formatMoney(otherWithholdings)}</strong><br>
-        Удержания всего: <strong>${formatMoney(totalWithhold)}</strong>
+        Удержания всего: <strong>${formatMoney(totalWithhold)}</strong><br>
+        Net_salary: <strong>${formatMoney(netSalary)}</strong><br>
+        Доля разовых замен в Gross_salary (Share_subst_percent): <strong>${shareSubstPercent === null ? '—' : formatPercent(shareSubstPercent)}</strong><br>
+        Цена 1 часа доп. замены «на руки» (Subst_hour_net): <strong>${substHourNet === null ? '—' : formatMoney(substHourNet)}</strong>
       `;
 
       logopedBreakdown.innerHTML = `
@@ -949,7 +963,12 @@
         = <strong>${formatMoney(zSubstExtra)}</strong>
       ` : 'Дополнительное замещение не учитывается.';
 
-      substitutionBreakdown.innerHTML = `${baseSubstitutionText}<br><br>${extraSubstitutionText}`;
+      const substitutionStatsText = `
+        Share_subst_percent = ${shareSubstPercent === null ? '—' : `<strong>${formatPercent(shareSubstPercent)}</strong>`}<br>
+        Subst_hour_net = ${substHourNet === null ? '—' : `<strong>${formatMoney(substHourNet)}</strong>`}
+      `;
+
+      substitutionBreakdown.innerHTML = `${baseSubstitutionText}<br><br>${extraSubstitutionText}<br><br>${substitutionStatsText}`;
 
       const compText = useComp ? `
         OVZ_base_mode: ${ovzBaseMode === 'combined' ? 'логопедический + учительский' : 'логопедический'}<br>
