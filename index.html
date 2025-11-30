@@ -562,7 +562,7 @@
               </div>
             </div>
           </div>
-          <div id="teacher_warning" class="warning-text" aria-live="polite"></div>
+          <div id="teacher_warning" class="warning-text warning" aria-live="polite"></div>
         </div>
         <div class="field">
           <label>Строки учебной нагрузки (по предметам)</label>
@@ -605,6 +605,7 @@
       <h2>Разовые замены <span class="info" tabindex="0" data-tooltip="Разовые замещения уроков: часы, численность класса и ставка по приказу или ученико-часу. (extra substitutions)">?</span></h2>
       <p class="section-note">Этот блок считает дополнительные замены сверх вашей тарификации. Здесь учитываются уроки, которые вы ведёте за коллег по приказу или по ставке ученико-часа, отдельно от оклада по договору.</p>
       <div id="substitution_warning" class="warning-text" aria-live="polite"></div>
+      <div id="extra_subst_warning" class="warning-text warning" aria-live="polite"></div>
       <div class="checkbox-row" style="margin-top:4px">
         <input id="use_extra_subst" type="checkbox">
         <label for="use_extra_subst" style="margin:0">Учитывать дополнительное замещение</label>
@@ -991,6 +992,7 @@
     const mrotWarning = document.getElementById('mrot_warning');
     const teacherWarning = document.getElementById('teacher_warning');
     const substitutionWarning = document.getElementById('substitution_warning');
+    const extraSubstWarning = document.getElementById('extra_subst_warning');
     const stimBlock = document.getElementById('stim_block');
     const stimTotalField = document.getElementById('stim_total');
     const ndflAmountField = document.getElementById('ndfl_amount');
@@ -1358,7 +1360,8 @@
       const a2 = useTeacher ? getValue('a2') : 0;
       const a3 = useTeacher ? getValue('a3') : 0;
       const studentSum = a1 + a2 + a3;
-      const hasTeacherLoad = useTeacher && (oTeacherContract > 0 || teacherLines.some((line) => (Number(line.t_week) || 0) > 0));
+      const hasSubjectHours = teacherLines.some((line) => (Number(line.t_week) || 0) > 0);
+      const hasTeacherLoad = useTeacher && (oTeacherContract > 0 || hasSubjectHours);
 
       const teacherCalc = useTeacher ? calculateTeacherLoad(cStu, weeksYear, monthsYear, a1, a2, a3) : { total: 0, lines: [] };
 
@@ -1391,6 +1394,12 @@
         }
       }
       substitutionWarning.textContent = substitutionIssues.join(' ');
+
+      if (useExtraSubst && hSubExtra > 120) {
+        extraSubstWarning.textContent = 'Очень много часов в месяц — проверьте, не перепутаны ли недели и месяцы.';
+      } else {
+        extraSubstWarning.textContent = '';
+      }
 
       // 5. Compensations
       const useComp = inputs.use_compensations.checked;
@@ -1536,8 +1545,8 @@
         mrotWarning.textContent = '';
       }
 
-      if (hasTeacherLoad && studentSum === 0) {
-        teacherWarning.textContent = 'Предупреждение: a1 + a2 + a3 = 0 при заданной учебной нагрузке. Уточните численность обучающихся.';
+      if (useTeacher && studentSum === 0 && hasSubjectHours) {
+        teacherWarning.textContent = 'Проверьте: количество учеников равно нулю, но есть часы по предметам.';
       } else {
         teacherWarning.textContent = '';
       }
