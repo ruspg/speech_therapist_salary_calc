@@ -395,12 +395,87 @@
       .input-with-unit {
         gap: 10px;
       }
+
     }
 
     .sub-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 10px 12px;
+    }
+
+    .teacher-line {
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #ffffff;
+      position: relative;
+    }
+
+    .teacher-line:nth-child(odd) {
+      background: #f8fbff;
+    }
+
+    .teacher-line:nth-child(even) {
+      background: #ffffff;
+    }
+
+    .teacher-line .teacher-main label,
+    .teacher-line .teacher-hours label {
+      font-weight: 700;
+    }
+
+    .teacher-line .teacher-coef label {
+      font-size: 13px;
+      color: #52606d;
+    }
+
+    .teacher-line .teacher-actions {
+      align-self: flex-end;
+    }
+
+    @media (max-width: 768px) {
+      .teacher-line {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "subject"
+          "hours"
+          "kdiv"
+          "ksubj"
+          "actions";
+        gap: 10px;
+      }
+
+      .teacher-line .teacher-main {
+        grid-area: subject;
+      }
+
+      .teacher-line .teacher-hours {
+        grid-area: hours;
+      }
+
+      .teacher-line .k-div-field {
+        grid-area: kdiv;
+      }
+
+      .teacher-line .k-subj-field {
+        grid-area: ksubj;
+      }
+
+      .teacher-line .teacher-actions {
+        grid-area: actions;
+        justify-self: flex-start;
+      }
+
+      .teacher-line .teacher-main label,
+      .teacher-line .teacher-hours label {
+        font-size: 15px;
+      }
+
+      .teacher-line .teacher-coef label {
+        font-size: 13px;
+      }
     }
 
     details {
@@ -1471,7 +1546,7 @@
         wrapper.dataset.lineId = line.id;
 
         const subjectField = document.createElement('div');
-        subjectField.className = 'field';
+        subjectField.className = 'field teacher-main';
         const subjectLabel = document.createElement('label');
         subjectLabel.textContent = 'Предмет';
         const subjectInput = document.createElement('input');
@@ -1486,7 +1561,7 @@
         subjectField.append(subjectLabel, subjectInput);
 
         const hoursField = document.createElement('div');
-        hoursField.className = 'field';
+        hoursField.className = 'field teacher-hours';
         const hoursLabel = document.createElement('label');
         hoursLabel.textContent = 'Часов в неделю (t_week)';
         const hoursInput = document.createElement('input');
@@ -1504,7 +1579,7 @@
         hoursField.append(hoursLabel, wrapWithUnit(hoursInput, 'ч/нед'));
 
         const kDivField = document.createElement('div');
-        kDivField.className = 'field';
+        kDivField.className = 'field teacher-coef k-div-field';
         const kDivLabel = document.createElement('label');
         kDivLabel.innerHTML = 'K_div <span class="info" tabindex="0" data-tooltip="Коэффициент деления класса на группы; выше 1, если класс делится. (K_div)">?</span>';
         const kDivInput = document.createElement('input');
@@ -1522,7 +1597,7 @@
         kDivField.append(kDivLabel, wrapWithUnit(kDivInput, 'коэфф.'));
 
         const kSubjField = document.createElement('div');
-        kSubjField.className = 'field';
+        kSubjField.className = 'field teacher-coef k-subj-field';
         const kSubjLabel = document.createElement('label');
         kSubjLabel.innerHTML = 'K_subj <span class="info" tabindex="0" data-tooltip="Коэффициент предмета: надбавка за сложность или приоритет предмета. (K_subj)">?</span>';
         const kSubjInput = document.createElement('input');
@@ -1540,7 +1615,7 @@
         kSubjField.append(kSubjLabel, wrapWithUnit(kSubjInput, 'коэфф.'));
 
         const removeField = document.createElement('div');
-        removeField.className = 'field';
+        removeField.className = 'field teacher-actions';
         const removeLabel = document.createElement('label');
         removeLabel.textContent = 'Удалить строку';
         const removeBtn = document.createElement('button');
