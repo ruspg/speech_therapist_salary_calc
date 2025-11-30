@@ -868,7 +868,7 @@
     function enhanceTooltips() {
       document.querySelectorAll('.info[data-tooltip]').forEach((tip, index) => {
         const label = tip.closest('label, h2');
-        const controlId = label?.getAttribute('for');
+        const controlId = label ? label.getAttribute('for') : null;
         const hintId = `${controlId || 'tooltip'}_${index}_hint`;
         const hint = document.createElement('span');
         hint.id = hintId;
@@ -878,7 +878,9 @@
         tip.setAttribute('role', 'note');
         tip.setAttribute('aria-label', tip.dataset.tooltip);
         tip.setAttribute('tabindex', tip.getAttribute('tabindex') || '0');
-        label?.appendChild(hint);
+        if (label) {
+          label.appendChild(hint);
+        }
         if (controlId) {
           const control = document.getElementById(controlId);
           mergeDescribedBy(control, hintId);
@@ -972,7 +974,7 @@
     const inputElements = Object.values(inputs).filter(Boolean);
 
     Object.values(inputs).forEach((input) => {
-      if (input?.type === 'number') {
+      if (input && input.type === 'number') {
         ensureMessageElement(input);
       }
     });
@@ -1079,7 +1081,10 @@
       message.className = 'input-message';
       message.setAttribute('role', 'status');
       message.setAttribute('aria-live', 'polite');
-      input.closest('.field')?.appendChild(message);
+      const field = input.closest('.field');
+      if (field) {
+        field.appendChild(message);
+      }
       mergeDescribedBy(input, message.id);
       inputMessages[input.id] = message;
       return message;
@@ -1123,7 +1128,7 @@
         value = 0;
       }
 
-      if (rule?.step) {
+      if (rule && rule.step) {
         const snapped = snapToStep(value, rule.step);
         if (snapped !== value) {
           value = snapped;
@@ -1132,13 +1137,13 @@
         }
       }
 
-      if (rule?.min !== undefined && value < rule.min) {
+      if (rule && rule.min !== undefined && value < rule.min) {
         value = rule.min;
         input.value = formatStepValue(value, rule.step || 1);
         messages.push(`Минимум ${rule.label || rule.min} — скорректировано.`);
       }
 
-      if (rule?.max !== undefined && value > rule.max) {
+      if (rule && rule.max !== undefined && value > rule.max) {
         value = rule.max;
         input.value = formatStepValue(value, rule.step || 1);
         messages.push(`Максимум ${rule.label || rule.max} — скорректировано.`);
@@ -1337,7 +1342,7 @@
 
     function clearMessagesForDisabled() {
       Object.values(inputs).forEach((input) => {
-        if (input?.disabled && inputMessages[input.id]) {
+        if (input && input.disabled && inputMessages[input.id]) {
           input.classList.remove('invalid');
           inputMessages[input.id].textContent = '';
         }
@@ -1382,7 +1387,8 @@
       const useExtraSubst = inputs.use_extra_subst.checked;
       const uValue = useExtraSubst ? getValue('u_value') : 0;
 
-      const substRateMode = Array.from(substRateRadios).find((radio) => radio.checked)?.value || defaults.inputs.subst_rate_mode;
+      const substRateChecked = Array.from(substRateRadios).find((radio) => radio.checked);
+      const substRateMode = (substRateChecked ? substRateChecked.value : undefined) || defaults.inputs.subst_rate_mode;
       const hSubExtra = useExtraSubst ? getValue('h_sub_extra') : 0;
       const rSubExtra = useExtraSubst ? getValue('r_sub_extra') : 0;
       const nClassSubst = useExtraSubst ? getValue('n_class_subst') : 0;
@@ -1416,7 +1422,8 @@
 
       // 5. Compensations
       const useComp = inputs.use_compensations.checked;
-      const ovzBaseMode = Array.from(ovzBaseRadios).find((radio) => radio.checked)?.value || defaults.inputs.ovz_base_mode;
+      const ovzBaseChecked = Array.from(ovzBaseRadios).find((radio) => radio.checked);
+      const ovzBaseMode = (ovzBaseChecked ? ovzBaseChecked.value : undefined) || defaults.inputs.ovz_base_mode;
       const kOvz = useComp ? getValue('k_ovz') : 0;
       const compOther = useComp ? getValue('comp_other') : 0;
       const ovzBase = ovzBaseMode === 'combined' ? baseOklad + oTeacherContract : baseOklad;
