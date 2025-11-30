@@ -221,6 +221,12 @@
       font-size: 14px;
     }
 
+    .warning-text {
+      color: var(--danger);
+      font-size: 14px;
+      margin-top: -6px;
+    }
+
     .flex-row {
       display: flex;
       align-items: center;
@@ -281,31 +287,9 @@
       </div>
       <div class="field">
         <label for="logoped_share">Доля ставки логопеда</label>
-        <input id="logoped_share" type="number" min="0" max="2" step="0.1">
+        <input id="logoped_share" type="number" min="0" max="1" step="0.25">
       </div>
-      <div class="field">
-        <label for="k_cat">Категория <span class="info" tabindex="0" data-tooltip="Категория педагога: без категории, первая или высшая. Коэффициент повышает оклад.">?</span></label>
-        <select id="k_cat">
-          <option value="1.0">Без категории (1.0)</option>
-          <option value="1.1">Первая категория (1.1)</option>
-          <option value="1.25">Высшая категория (1.25)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="k_staj">Педагогический стаж <span class="info" tabindex="0" data-tooltip="Коэффициент стажа: рост с опытом. Диапазон 1.0–1.5.">?</span></label>
-        <select id="k_staj">
-          <option value="1.0">&lt; 1 года (1.0)</option>
-          <option value="1.1">1–5 лет (1.1)</option>
-          <option value="1.2">5–10 лет (1.2)</option>
-          <option value="1.3">10–15 лет (1.3)</option>
-          <option value="1.4">15–20 лет (1.4)</option>
-          <option value="1.5">20+ лет (1.5)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="k_usl_log">Коэффициент условий труда (логопед) <span class="info" tabindex="0" data-tooltip="Учитывает особые условия труда. Обычно 1.0–1.3.">?</span></label>
-        <input id="k_usl_log" type="number" min="0" step="0.05">
-      </div>
+      <div id="mrot_warning" class="warning-text" aria-live="polite"></div>
     </section>
 
     <section>
@@ -393,9 +377,6 @@
       months_year: 12,
       t_logoped: 70000,
       logoped_share: 1.0,
-      k_cat: 1.0,
-      k_staj: 1.1,
-      k_usl_log: 1.0,
       use_substitution: true,
       h_subst: 12,
       n_students: 8,
@@ -418,9 +399,6 @@
       months_year: document.getElementById('months_year'),
       t_logoped: document.getElementById('t_logoped'),
       logoped_share: document.getElementById('logoped_share'),
-      k_cat: document.getElementById('k_cat'),
-      k_staj: document.getElementById('k_staj'),
-      k_usl_log: document.getElementById('k_usl_log'),
       use_substitution: document.getElementById('use_substitution'),
       h_subst: document.getElementById('h_subst'),
       n_students: document.getElementById('n_students'),
@@ -442,6 +420,8 @@
     const substitutionBlock = document.getElementById('substitution_block');
     const resetBtn = document.getElementById('reset_btn');
     const copyBtn = document.getElementById('copy_btn');
+    const mrotWarning = document.getElementById('mrot_warning');
+    const MROT = 19372;
 
     function formatMoney(value) {
       return `${value.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`;
@@ -486,12 +466,9 @@
     function recalc() {
       const tLogoped = parseNumber(inputs.t_logoped);
       const share = parseNumber(inputs.logoped_share);
-      const kCat = parseNumber(inputs.k_cat);
-      const kStaj = parseNumber(inputs.k_staj);
-      const kUslLog = parseNumber(inputs.k_usl_log);
 
       const baseOklad = tLogoped * share;
-      const zLogoped = baseOklad * kCat * kStaj * kUslLog;
+      const zLogoped = baseOklad;
 
       const useSubst = inputs.use_substitution.checked;
       const hSubst = useSubst ? parseNumber(inputs.h_subst) : 0;
@@ -521,8 +498,8 @@
       `;
 
       logopedBreakdown.innerHTML = `
-        Формула: Оклад = Оклад_ставка × Доля_ставки × K_кат × K_стаж × K_усл_лог<br>
-        = ${formatMoney(tLogoped)} × ${share.toFixed(2)} × ${kCat.toFixed(2)} × ${kStaj.toFixed(2)} × ${kUslLog.toFixed(2)}<br>
+        Формула: Base_logoped = O_logoped_base × S_log<br>
+        = ${formatMoney(tLogoped)} × ${share.toFixed(2)}<br>
         = <strong>${formatMoney(zLogoped)}</strong>
       `;
 
@@ -538,6 +515,12 @@
         Компенсации: ${useComp ? 'учитываются' : 'не учитываются'} — <strong>${formatMoney(zComp)}</strong><br>
         Стимулирующие: ${useStim ? 'учитываются' : 'не учитываются'} — <strong>${formatMoney(zStim)}</strong>
       `;
+
+      if (baseOklad < MROT && baseOklad > 0) {
+        mrotWarning.textContent = `Внимание: расчетный оклад ниже МРОТ (${formatMoney(MROT)}). Проверьте доплаты.`;
+      } else {
+        mrotWarning.textContent = '';
+      }
     }
 
     function attachListeners() {
