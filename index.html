@@ -315,6 +315,37 @@
       display: none;
     }
 
+    .collapsible-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      padding: 0;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .collapsible-card summary {
+      padding: 14px 16px;
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .collapsible-card summary h2 {
+      margin: 0;
+      font-size: inherit;
+    }
+
+    .collapsible-card[open] summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .collapsible-card .collapsible-body {
+      padding: 12px 16px 14px;
+    }
+
     .hidden {
       display: none;
     }
@@ -891,10 +922,9 @@
       </div>
     </section>
 
-    <section>
-      <h2>Помощь и нормативные документы</h2>
-      <details>
-        <summary>Открыть справку</summary>
+    <details class="collapsible-card">
+      <summary><h2>Помощь и нормативные документы</h2></summary>
+      <div class="collapsible-body">
         <div class="accordion-content">
           <p>Ключевые подсказки для корректного ввода данных:</p>
           <ul>
@@ -904,44 +934,46 @@
           </ul>
           <p class="muted">Приказ об оплате труда, Положение о стимулирующих и локальные нормативные акты школы помогут быстро заполнить форму.</p>
         </div>
-      </details>
-    </section>
-
-    <section>
-      <h2>Итоги и расшифровка</h2>
-      <details open>
-        <summary>Краткие итоги</summary>
-        <div class="accordion-content" id="totals_breakdown"></div>
-      </details>
-      <details>
-        <summary>Оклад логопеда</summary>
-        <div class="accordion-content" id="logoped_breakdown"></div>
-      </details>
-      <details>
-        <summary>Учебная нагрузка</summary>
-        <div class="accordion-content" id="teacher_breakdown"></div>
-      </details>
-      <details>
-        <summary>Разовые замены</summary>
-        <div class="accordion-content" id="substitution_breakdown"></div>
-      </details>
-      <details>
-        <summary>Компенсации</summary>
-        <div class="accordion-content" id="comp_breakdown"></div>
-      </details>
-      <details>
-        <summary>Стимулирующие выплаты</summary>
-        <div class="accordion-content" id="stim_breakdown"></div>
-      </details>
-      <details>
-        <summary>Налоги и удержания</summary>
-        <div class="accordion-content" id="taxes_breakdown"></div>
-      </details>
-      <div class="buttons">
-        <button class="btn-secondary" id="reset_btn" type="button">Сбросить к значениям по умолчанию</button>
-        <button class="btn-primary" id="copy_btn" type="button">Скопировать результат</button>
       </div>
-    </section>
+    </details>
+
+    <details class="collapsible-card">
+      <summary><h2>Итоги и расшифровка</h2></summary>
+      <div class="collapsible-body">
+        <details>
+          <summary>Краткие итоги</summary>
+          <div class="accordion-content" id="totals_breakdown"></div>
+        </details>
+        <details>
+          <summary>Оклад логопеда</summary>
+          <div class="accordion-content" id="logoped_breakdown"></div>
+        </details>
+        <details>
+          <summary>Учебная нагрузка</summary>
+          <div class="accordion-content" id="teacher_breakdown"></div>
+        </details>
+        <details>
+          <summary>Разовые замены</summary>
+          <div class="accordion-content" id="substitution_breakdown"></div>
+        </details>
+        <details>
+          <summary>Компенсации</summary>
+          <div class="accordion-content" id="comp_breakdown"></div>
+        </details>
+        <details>
+          <summary>Стимулирующие выплаты</summary>
+          <div class="accordion-content" id="stim_breakdown"></div>
+        </details>
+        <details>
+          <summary>Налоги и удержания</summary>
+          <div class="accordion-content" id="taxes_breakdown"></div>
+        </details>
+        <div class="buttons">
+          <button class="btn-secondary" id="reset_btn" type="button">Сбросить к значениям по умолчанию</button>
+          <button class="btn-primary" id="copy_btn" type="button">Скопировать результат</button>
+        </div>
+      </div>
+    </details>
   </div>
 
   <script>
