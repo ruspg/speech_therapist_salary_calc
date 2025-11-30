@@ -1646,10 +1646,12 @@
     function buildSummaryHtml(data) {
       return `
         <strong>Оклад логопеда (Base_logoped):</strong> ${formatMoney(data.baseOklad)}<br>
-        <strong>Учебная нагрузка:</strong> по договору (O_teacher_contract) — ${formatMoney(data.teacherContract)}, по формуле (O_teacher_calc) — ${formatMoney(data.teacherCalc)}, Δ (Delta_teacher) — ${formatSignedMoney(data.teacherDelta)}<br>
-        <strong>Разовые замены (Subst_extra):</strong> ${formatMoney(data.extraSubstitution)}<br>
+        <strong>Учебная нагрузка по договору (O_teacher_contract):</strong> ${formatMoney(data.teacherContract)}<br>
+        <strong>Учебная нагрузка по формуле (O_teacher_calc):</strong> ${formatMoney(data.teacherCalc)}<br>
+        <strong>Разница по нагрузке (Delta_teacher):</strong> ${formatSignedMoney(data.teacherDelta)}<br>
+        <strong>Дополнительные замены (Subst_extra):</strong> ${formatMoney(data.extraSubstitution)}<br>
         <strong>Компенсации:</strong> всего (Comp_total) — ${formatMoney(data.compTotal)}, ОВЗ (Comp_OVZ) — ${formatMoney(data.compOvz)}, прочие (Comp_other) — ${formatMoney(data.compOther)}<br>
-        <strong>Стимулирующие (Stim_total):</strong> ${formatMoney(data.stimTotal)}<br>
+        <strong>Стимулирующие выплаты (Stim_total):</strong> ${formatMoney(data.stimTotal)}<br>
         <strong>Налоги и удержания:</strong> НДФЛ (Ndfl_amount) ${formatPercent(data.ndflRate, { minimumFractionDigits: 0, maximumFractionDigits: 1 })} — ${formatMoney(data.ndflAmount)}, прочие (Other_withholdings) — ${formatMoney(data.otherWithholdings)}, всего (Total_withhold) — ${formatMoney(data.totalWithhold)}<br>
         <strong>Итоги:</strong> начислено (Gross_salary) — ${formatMoney(data.grossSalary)}, на руки (Net_salary) — ${formatMoney(data.netSalary)}<br>
         Доля разовых замен в начислениях (Share_subst_percent): <strong>${data.shareSubstPercent === null ? '—' : formatPercent(data.shareSubstPercent)}</strong><br>
