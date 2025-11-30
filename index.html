@@ -568,7 +568,7 @@
           <div id="teacher_lines"></div>
           <button id="add_teacher_line" class="btn-secondary" type="button" style="margin-top:6px">Добавить предмет</button>
         </div>
-        <div class="muted" style="font-size:13px">Расчёт по формуле 3.9: O_line = C_stu × t_week × Weeks_year / Months_year × (K_div + K_subj − 1)</div>
+        <div class="muted" style="font-size:13px">Расчёт по формуле 3.9: O_teacher_calc = C_stu × Σ[(a1 + 2·a2 + 3·a3) × t_week × (K_div + K_subj − 1)] × Weeks_year / Months_year</div>
         <div class="stat-grid" aria-live="polite">
           <div class="stat-card">
             <div class="stat-label">По договору</div>
@@ -1417,7 +1417,7 @@
       const studentSum = a1 + a2 + a3;
       const hasTeacherLoad = useTeacher && (oTeacherContract > 0 || teacherLines.some((line) => (Number(line.t_week) || 0) > 0));
 
-      const teacherCalc = useTeacher ? calculateTeacherLoad(cStu, weeksYear, monthsYear) : { total: 0, lines: [] };
+      const teacherCalc = useTeacher ? calculateTeacherLoad(cStu, weeksYear, monthsYear, a1, a2, a3) : { total: 0, lines: [] };
 
       const useSubst = false;
       const hSubst = 0;
@@ -1606,8 +1606,10 @@
       }
     }
 
-    function calculateTeacherLoad(cStu, weeksYear, monthsYear) {
-      let total = 0;
+    function calculateTeacherLoad(cStu, weeksYear, monthsYear, a1, a2, a3) {
+      const pupilFactor = a1 + 2 * a2 + 3 * a3;
+
+      let sTotal = 0;
       const lines = [];
 
       teacherLines.forEach((line, index) => {
@@ -1615,11 +1617,13 @@
         const kDiv = Math.max(1, Number(line.k_div) || 0);
         const kSubj = Math.max(1, Number(line.k_subj) || 0);
         const kTotal = Math.max(0, kDiv + kSubj - 1);
-        const oLine = cStu * tWeek * weeksYear / monthsYear * kTotal;
-        total += oLine;
-        lines.push(`Строка ${index + 1} (${line.subject || 'без названия'}): ${formatMoney(oLine)} (t_week=${formatNumber(tWeek, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}, K_div=${formatNumber(kDiv, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}, K_subj=${formatNumber(kSubj, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}, K_total=${formatNumber(kTotal, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`);
+        const sRow = pupilFactor * tWeek * kTotal;
+        sTotal += sRow;
+        const oLine = cStu * sRow * weeksYear / monthsYear;
+        lines.push(`Строка ${index + 1} (${line.subject || 'без названия'}): ${formatMoney(oLine)} (ученики-фактор=${formatNumber(pupilFactor)}, t_week=${formatNumber(tWeek, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}, K_div=${formatNumber(kDiv, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}, K_subj=${formatNumber(kSubj, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}, K_total=${formatNumber(kTotal, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`);
       });
 
+      const total = cStu * sTotal * weeksYear / monthsYear;
       return { total, lines };
     }
 
