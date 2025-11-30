@@ -1039,12 +1039,15 @@
     let lastSummarySnapshot = null;
     let lastRSubCurrent = 0;
 
-    // Format numeric values with locale-aware separators.
+    // Format numeric values with Russian-style grouping (thin spaces) and comma decimals.
+    // Examples: formatNumber(77890.5, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) => "77 890,5".
     function formatNumber(value, { minimumFractionDigits = 0, maximumFractionDigits = minimumFractionDigits } = {}) {
-      return Number(value).toLocaleString('ru-RU', { minimumFractionDigits, maximumFractionDigits });
+      const formatter = new Intl.NumberFormat('ru-RU', { minimumFractionDigits, maximumFractionDigits, useGrouping: true });
+      return formatter.format(Number(value) || 0).replace(/\u00A0/g, '\u202F');
     }
 
-    // Format currency values in rubles with two decimal places.
+    // Format currency values in rubles with fixed two decimals and Russian separators.
+    // Example: formatMoney(31869.3333) => "31 869,33 ₽".
     function formatMoney(value) {
       return `${formatNumber(value, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`;
     }
