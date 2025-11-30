@@ -999,6 +999,8 @@
       other_withholdings: document.getElementById('other_withholdings'),
     };
 
+    const inputElements = Object.values(inputs).filter(Boolean);
+
     Object.values(inputs).forEach((input) => {
       if (input?.type === 'number') {
         ensureMessageElement(input);
@@ -1339,9 +1341,12 @@
       });
       addTeacherLineBtn.disabled = !teacherEnabled;
 
-      inputs.use_substitution.checked = false;
-      inputs.use_substitution.disabled = true;
-      const substitutionEnabled = false;
+      const substitutionCheckbox = inputs.use_substitution;
+      if (substitutionCheckbox) {
+        substitutionCheckbox.checked = false;
+        substitutionCheckbox.disabled = true;
+      }
+      const substitutionEnabled = Boolean(substitutionCheckbox?.checked);
       const extraSubstitutionEnabled = inputs.use_extra_subst.checked;
       const shouldEnableUValue = substitutionEnabled || extraSubstitutionEnabled;
       [...substitutionBlock.querySelectorAll('input')].forEach((el) => {
@@ -1349,9 +1354,7 @@
           el.disabled = !shouldEnableUValue;
           return;
         }
-        if (el.id !== 'use_substitution') {
-          el.disabled = !substitutionEnabled;
-        }
+        el.disabled = !substitutionEnabled;
       });
 
       [...extraSubstBlock.querySelectorAll('input, select')].forEach((el) => {
@@ -1621,7 +1624,7 @@
     }
 
     function attachListeners() {
-      Object.values(inputs).forEach((el) => {
+      inputElements.forEach((el) => {
         el.addEventListener('input', () => {
           handleToggles();
           recalc();
@@ -1670,7 +1673,9 @@
     const testInputs = {
       studentHourRate: () => {
         setDefaults();
-        inputs.use_substitution.checked = false;
+        if (inputs.use_substitution) {
+          inputs.use_substitution.checked = false;
+        }
         inputs.use_extra_subst.checked = true;
         inputs.h_sub_extra.value = 5;
         inputs.u_value.value = 150;
