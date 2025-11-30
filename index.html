@@ -159,6 +159,48 @@
       background: #f8fbff;
     }
 
+    .teacher-overview {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .teacher-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .teacher-label {
+      font-size: 13px;
+      color: #52606d;
+      font-weight: 600;
+    }
+
+    .teacher-badge {
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-weight: 700;
+      background: var(--accent-soft);
+      border: 1px solid var(--border);
+      min-width: 120px;
+      text-align: right;
+    }
+
+    .delta-positive {
+      color: #0f9151;
+      background: #e5f5ee;
+      border-color: #c5eadc;
+    }
+
+    .delta-negative {
+      color: var(--danger);
+      background: #fde8e8;
+      border-color: #facdcd;
+    }
+
     .stat-label {
       font-size: 13px;
       color: #52606d;
@@ -368,6 +410,20 @@
           <div class="stat-card">
             <div class="stat-label">Разница</div>
             <div class="stat-value" id="teacher_delta_display">0 ₽</div>
+          </div>
+        </div>
+        <div class="stat-card teacher-overview" aria-live="polite">
+          <div class="teacher-row">
+            <span class="teacher-label">O_teacher_contract</span>
+            <span class="teacher-badge" id="teacher_contract_chip">0 ₽</span>
+          </div>
+          <div class="teacher-row">
+            <span class="teacher-label">O_teacher_calc</span>
+            <span class="teacher-badge" id="teacher_calc_chip">0 ₽</span>
+          </div>
+          <div class="teacher-row">
+            <span class="teacher-label">Delta_teacher</span>
+            <span class="teacher-badge" id="teacher_delta_chip">0 ₽</span>
           </div>
         </div>
       </div>
@@ -627,6 +683,9 @@
     const teacherContractDisplay = document.getElementById('teacher_contract_display');
     const teacherFormulaDisplay = document.getElementById('teacher_formula_display');
     const teacherDeltaDisplay = document.getElementById('teacher_delta_display');
+    const teacherContractChip = document.getElementById('teacher_contract_chip');
+    const teacherCalcChip = document.getElementById('teacher_calc_chip');
+    const teacherDeltaChip = document.getElementById('teacher_delta_chip');
     const substitutionBreakdown = document.getElementById('substitution_breakdown');
     const extrasBreakdown = document.getElementById('extras_breakdown');
     const teacherBlock = document.getElementById('teacher_block');
@@ -644,6 +703,7 @@
     const totalWithholdField = document.getElementById('total_withhold');
     const MROT = 19372;
     const CORRECTION_CLASS_COEF = 1.3;
+    const DELTA_CLASSES = ['delta-positive', 'delta-negative'];
 
     const substRateRadios = document.querySelectorAll('input[name="subst_rate_mode"]');
     const ovzBaseRadios = document.querySelectorAll('input[name="ovz_base_mode"]');
@@ -657,6 +717,12 @@
 
     function formatMoney(value) {
       return `${value.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`;
+    }
+
+    function formatSignedMoney(value) {
+      const sign = value > 0 ? '+' : value < 0 ? '−' : '';
+      const absolute = Math.abs(value);
+      return `${sign}${formatMoney(absolute)}`;
     }
 
     function formatPercent(value) {
@@ -944,6 +1010,15 @@
       teacherContractDisplay.textContent = formatMoney(oTeacherContract);
       teacherFormulaDisplay.textContent = formatMoney(teacherCalc.total);
       teacherDeltaDisplay.textContent = formatMoney(teacherDelta);
+      teacherContractChip.textContent = formatMoney(oTeacherContract);
+      teacherCalcChip.textContent = formatMoney(teacherCalc.total);
+      teacherDeltaChip.textContent = formatSignedMoney(teacherDelta);
+      teacherDeltaChip.classList.remove(...DELTA_CLASSES);
+      if (teacherDelta > 0) {
+        teacherDeltaChip.classList.add('delta-positive');
+      } else if (teacherDelta < 0) {
+        teacherDeltaChip.classList.add('delta-negative');
+      }
 
       const baseSubstitutionText = useSubst ? `
         Стоимость часа: C_ч = U × N_учеников × K_corr × K_subst × K_усл_subst<br>
